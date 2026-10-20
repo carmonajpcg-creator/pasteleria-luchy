@@ -76,7 +76,7 @@ Reglas: dinero en centavos enteros; totales siempre calculados en BD; RLS en tod
 | D7 | Antispam: límite por IP en Edge Function + caducidad de pedidos no confirmados | A definir en Fase 6/9. Fase 4 añade un tope de 5 pedidos pendientes por teléfono y hora, y `expire_pending_orders()`. |
 | D8 | El público lee productos solo por la vista `catalog_products` (disponibilidad booleana, sin cifra de stock) | No exponer inventario exacto; `products` queda solo para admin. |
 | D9 | `stock_quantity` sin grant de escritura: solo cambia por RPC con movimiento auditado | Evita ajustes sin rastro y dobles descuentos. |
-| D10 | `store_settings.timezone = 'UTC'` como valor neutro | Zona horaria pendiente (CLAUDE.md §14); afecta el cálculo de fecha mínima. |
+| D10 | `store_settings.timezone` por defecto `'UTC'`; la tienda (Piedras Negras, Coahuila) usa `America/Matamoros` | Define la fecha mínima de entrega en servidor y cliente. La ciudad la indicó la persona dueña del proyecto (2026-10-20); cobertura y horarios siguen pendientes (CLAUDE.md §14). |
 | D11 | Semillas: pasteles y caja surtida `made_to_order`, el resto `stock` con 12 unidades | Suposición de demo; política real pendiente. |
 
 ## 6. Backlog por fase

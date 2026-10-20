@@ -17,7 +17,9 @@ Verificado tras las correcciones: pgTAP 44/44 (`20260101000400_revision_fase6.sq
 
 Sin hallazgo: precios y total solo del servidor, sin descuento de stock al crear, idempotencia ante concurrencia, token en el fragmento `#` (no viaja a servidores ni en `Referer`).
 
-Pendientes conscientes: límite por IP (Edge Function, D7) y **zona horaria real de la tienda** (`store_settings.timezone` sigue en `UTC`, CLAUDE.md §14).
+Zona horaria de la tienda: **Piedras Negras, Coahuila → `America/Matamoros`** (franja fronteriza: horario central con cambio de horario de verano). Está configurada en el proyecto de pruebas; en producción se fijará desde el panel de configuración (Fase 7) o con `update public.store_settings set timezone = 'America/Matamoros'`. El valor por defecto de la migración sigue siendo `UTC`.
+
+Pendiente consciente: límite por IP (Edge Function, D7).
 
 Detalle de la implementación (2026-10-20):
 

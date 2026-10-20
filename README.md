@@ -4,7 +4,16 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 4 — Base de datos y Supabase: completada** (Fases 1–3 completadas). Migraciones y semillas aplicadas en el proyecto Supabase Cloud de pruebas `luchy-pruebas` (ref `qqstdkfnsnoivumakwza`, us-east-1). Resultados del 2026-10-19:
+**Fase 5 — Catálogo: completada** (Fases 1–4 completadas). Inicio, catálogo con búsqueda y filtro por categoría (en la URL), detalle de producto, contacto desde la configuración pública y páginas de nosotros/privacidad/condiciones como **borrador** pendiente de revisión. Resultados del 2026-10-20:
+
+- Vitest 20/20, lint y typecheck limpios, build correcto.
+- Playwright 71 correctas y 1 omitida (teclado en móvil): rutas, catálogo, filtros, búsqueda sin acentos, detalle, estados de error, axe WCAG A/AA y sin desbordamiento. Usa respuestas de Supabase simuladas (`tests/e2e/helpers.ts`); nunca toca la nube.
+- Verificación manual con el build real contra `luchy-pruebas`: 20 productos, 4 cupcakes, detalle, 6 destacados, enlace `wa.me` con el número configurado, 0 errores de consola.
+- Pendiente: fotos demo con licencia (hoy se muestra «Imagen de ejemplo»), botón «Agregar al carrito» (Fase 6; el detalle lo indica con una nota), regresión visual versionada, contenido definitivo de privacidad/condiciones/nosotros.
+
+El número de WhatsApp de la tienda vive en la base de datos (`store_settings.whatsapp_number`), no en el código ni en el repositorio. En el proyecto de pruebas ya está configurado.
+
+## Fase 4 — Base de datos y Supabase (completada) Migraciones y semillas aplicadas en el proyecto Supabase Cloud de pruebas `luchy-pruebas` (ref `qqstdkfnsnoivumakwza`, us-east-1). Resultados del 2026-10-19:
 
 - 37/37 pruebas pgTAP correctas (`npm run test:db`).
 - Sondeo de la API REST con clave pública: `anon` lee `catalog_products` (20) y la configuración pública. Obtiene 401 en `products`, `orders`, `store_settings.timezone` y `confirm_order`. `get_order_public` con token falso devuelve `null`.

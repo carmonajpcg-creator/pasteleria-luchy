@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test'
 import { AxeBuilder } from '@axe-core/playwright'
+import { mockSupabase } from './helpers'
+
+test.beforeEach(({ page }) => mockSupabase(page))
 
 // E01: todas las rutas cargan sin errores de consola; recarga en ruta profunda funciona.
 const rutas: [string, string][] = [
   ['/#/', 'Pastelería Luchy'],
   ['/#/catalogo', 'Catálogo'],
-  ['/#/producto/pastel-tres-leches', 'Detalle de producto'],
+  ['/#/producto/pastel-tres-leches', 'Pastel de tres leches'],
   ['/#/carrito', 'Carrito'],
   ['/#/checkout', 'Checkout'],
   ['/#/pedido/LUCHY-0001', 'Seguimiento de pedido'],

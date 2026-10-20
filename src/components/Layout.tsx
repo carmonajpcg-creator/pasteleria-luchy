@@ -41,6 +41,8 @@ export function Layout() {
         <div className="mx-auto max-w-6xl px-4">
           <p>
             Horarios y cobertura: por definir. ·{' '}
+            <NavLink to="/nosotros" className="text-green-300 underline">Nosotros</NavLink> ·{' '}
+            <NavLink to="/contacto" className="text-green-300 underline">Contacto</NavLink> ·{' '}
             <NavLink to="/privacidad" className="text-green-300 underline">Privacidad</NavLink> ·{' '}
             <NavLink to="/condiciones" className="text-green-300 underline">Condiciones</NavLink>
           </p>

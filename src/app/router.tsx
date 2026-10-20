@@ -1,6 +1,10 @@
 import { createHashRouter, type RouteObject } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { PlaceholderPage } from '../components/PlaceholderPage'
+import { CatalogPage } from '../features/catalog/pages/CatalogPage'
+import { HomePage } from '../features/catalog/pages/HomePage'
+import { ProductPage } from '../features/catalog/pages/ProductPage'
+import { AboutPage, ContactPage, PrivacyPage, TermsPage } from '../features/content/StaticPages'
 
 const page = (title: string, phase: string) => <PlaceholderPage title={title} phase={phase} />
 
@@ -10,16 +14,16 @@ export const routes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      { path: '/', element: page('Pastelería Luchy', 'Fase 5') },
-      { path: '/catalogo', element: page('Catálogo', 'Fase 5') },
-      { path: '/producto/:slug', element: page('Detalle de producto', 'Fase 5') },
+      { path: '/', element: <HomePage /> },
+      { path: '/catalogo', element: <CatalogPage /> },
+      { path: '/producto/:slug', element: <ProductPage /> },
       { path: '/carrito', element: page('Carrito', 'Fase 6') },
       { path: '/checkout', element: page('Checkout', 'Fase 6') },
       { path: '/pedido/:folio', element: page('Seguimiento de pedido', 'Fase 6') },
-      { path: '/nosotros', element: page('Nosotros', 'Fase 5') },
-      { path: '/contacto', element: page('Contacto', 'Fase 5') },
-      { path: '/privacidad', element: page('Aviso de privacidad', 'Fase 5') },
-      { path: '/condiciones', element: page('Condiciones de pedido', 'Fase 5') },
+      { path: '/nosotros', element: <AboutPage /> },
+      { path: '/contacto', element: <ContactPage /> },
+      { path: '/privacidad', element: <PrivacyPage /> },
+      { path: '/condiciones', element: <TermsPage /> },
       // Admin: marcadores sin datos. La autenticación real y RLS llegan en Fases 4 y 7.
       { path: '/admin/login', element: page('Acceso administrador', 'Fase 7') },
       { path: '/admin', element: page('Panel administrativo', 'Fase 7') },

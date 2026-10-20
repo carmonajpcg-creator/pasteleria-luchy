@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter } from './app/router'
 import './styles/index.css'
 
-const queryClient = new QueryClient()
+// Un solo reintento: ante una caída de red el aviso de error aparece en ~1 s, no en ~7 s.
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1 } } })
 const router = createRouter()
 
 createRoot(document.getElementById('root')!).render(

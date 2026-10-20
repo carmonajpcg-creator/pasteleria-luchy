@@ -22,5 +22,11 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // El build de pruebas apunta a un host ficticio: las respuestas se simulan en
+    // tests/e2e/helpers.ts, así que nunca se consulta el proyecto real de Supabase.
+    env: {
+      VITE_SUPABASE_URL: 'http://supabase.test',
+      VITE_SUPABASE_ANON_KEY: 'clave-publica-de-prueba',
+    },
   },
 })

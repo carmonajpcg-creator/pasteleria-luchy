@@ -1,0 +1,52 @@
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-700.css';
+@import '@fontsource/poppins/latin-ext-600.css';
+@import '@fontsource/poppins/latin-ext-700.css';
+@import 'tailwindcss';
+
+/* Tokens definidos en design/tokens.css (Fase 2). Verde 600 solo decorativo: 3.30:1 con blanco. */
+@theme {
+  --color-purple-600: #7c3aed;
+  --color-purple-700: #6d28d9;
+  --color-purple-400: #a78bfa;
+  --color-purple-100: #ede9fe;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-300: #86efac;
+  --color-bg: #fff7fb;
+  --color-ink: #2d1b3d;
+  --color-muted: #6b7280;
+  --color-line: #e9ddf3;
+  --color-danger: #b91c1c;
+  --font-heading: 'Poppins', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --radius-card: 16px;
+  --shadow-card: 0 4px 20px rgb(124 58 237 / 0.1);
+}
+
+@layer base {
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    line-height: 1.2;
+  }
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--color-purple-700);
+    border-radius: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm *)",
+      "PowerShell(npm.cmd *)",
+      "PowerShell(npx *)",
+      "PowerShell(npx.cmd *)",
+      "PowerShell(node *)",
+      "PowerShell(git status*)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)",
+      "PowerShell(git log *)",
+      "PowerShell(git diff*)",
+      "PowerShell(git branch*)",
+      "PowerShell(git check-ignore *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Select-String *)",
+      "PowerShell(Remove-Item scripts\\_*)",
+      "PowerShell(Start-Process *)",
+      "PowerShell(Stop-Process *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git log *)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(ls *)"
+    ],
+    "deny": [
+      "PowerShell(git push*)",
+      "PowerShell(git reset --hard*)",
+      "PowerShell(git clean *)",
+      "PowerShell(Remove-Item * -Recurse*)",
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -r *)"
+    ]
+  }
+}

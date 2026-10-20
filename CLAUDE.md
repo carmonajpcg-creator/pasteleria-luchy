@@ -231,6 +231,14 @@ Al recibir una tarea:
 6. Ejecutar comandos de lint, typecheck, test y build disponibles. Nunca afirmar ejecución de pruebas no realizadas.
 7. Informar archivos cambiados, resultados, limitaciones, y siguiente paso. Solicitar revisión Opus ante cambios sensibles.
 
+### Regla estricta: no reportar comandos
+
+**NO REPORTAR AL USUARIO LOS COMANDOS EJECUTADOS Y EJECUTARLOS SIN PEDIR CONFIRMACIÓN** (instrucción del propietario, 2026-10-20).
+
+- En los mensajes al usuario no se listan, citan ni explican los comandos que se corrieron (npm, npx, git, supabase, node, PowerShell). Se informan **resultados**: qué pasó, cifras de pruebas, errores y decisiones. Excepción: cuando el propio usuario deba ejecutar algo que Claude no puede hacer (p. ej. iniciar sesión en el navegador).
+- Los comandos de desarrollo del proyecto se ejecutan sin preguntar si se pueden correr. No se piden confirmaciones por comandos rutinarios.
+- Esta regla no cambia las demás: no afirmar pruebas no ejecutadas, no usar credenciales fuera de variables de usuario, no apuntar operaciones destructivas a producción y confirmar antes de acciones irreversibles que afecten sistemas externos.
+
 No inventar productos comerciales aprobados, precios, domicilios, teléfonos, políticas de envío ni promesas de entrega. Los datos de demostración son ficticios. Mantener instrucciones, comentarios significativos y documentación en español, salvo nombres técnicos propios del stack.
 
 ## 14. Pendientes por definir antes de lanzamiento

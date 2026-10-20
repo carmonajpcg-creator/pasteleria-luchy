@@ -11,7 +11,6 @@ describe('router', () => {
     ['/privacidad', 'Aviso de privacidad'],
     ['/condiciones', 'Condiciones de pedido'],
     ['/nosotros', 'Nosotros'],
-    ['/admin/pedidos', 'Pedidos'],
   ])('muestra %s', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument()

@@ -1,6 +1,7 @@
 import { createHashRouter, type RouteObject } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { PlaceholderPage } from '../components/PlaceholderPage'
+import { adminRoutes } from './adminRoutes'
 import { CartPage } from '../features/cart/pages/CartPage'
 import { CheckoutPage } from '../features/orders/pages/CheckoutPage'
 import { OrderPage } from '../features/orders/pages/OrderPage'
@@ -27,17 +28,11 @@ export const routes: RouteObject[] = [
       { path: '/contacto', element: <ContactPage /> },
       { path: '/privacidad', element: <PrivacyPage /> },
       { path: '/condiciones', element: <TermsPage /> },
-      // Admin: marcadores sin datos. La autenticación real y RLS llegan en Fases 4 y 7.
-      { path: '/admin/login', element: page('Acceso administrador', 'Fase 7') },
-      { path: '/admin', element: page('Panel administrativo', 'Fase 7') },
-      { path: '/admin/productos', element: page('Productos', 'Fase 7') },
-      { path: '/admin/categorias', element: page('Categorías', 'Fase 7') },
-      { path: '/admin/inventario', element: page('Inventario', 'Fase 7') },
-      { path: '/admin/pedidos', element: page('Pedidos', 'Fase 7') },
-      { path: '/admin/configuracion', element: page('Configuración', 'Fase 7') },
       { path: '*', element: page('Página no encontrada', 'Fase 3') },
     ],
   },
+  // El panel tiene su propio diseño y sesión; se carga bajo demanda (ver adminRoutes.tsx).
+  adminRoutes,
 ]
 
 export const createRouter = () => createHashRouter(routes)

@@ -17,12 +17,16 @@ const rutas: [string, string][] = [
   ['/#/privacidad', 'Aviso de privacidad'],
   ['/#/condiciones', 'Condiciones de pedido'],
   ['/#/admin/login', 'Acceso administrador'],
-  ['/#/admin', 'Panel administrativo'],
-  ['/#/admin/productos', 'Productos'],
-  ['/#/admin/categorias', 'Categorías'],
-  ['/#/admin/inventario', 'Inventario'],
-  ['/#/admin/pedidos', 'Pedidos'],
-  ['/#/admin/configuracion', 'Configuración'],
+  // Rutas protegidas del panel: sin sesión, la recarga en ruta profunda termina en el login (Fase 7).
+  // El contenido real de cada pantalla se prueba con sesión en admin.spec.ts.
+  ['/#/admin', 'Acceso administrador'],
+  ['/#/admin/productos', 'Acceso administrador'],
+  ['/#/admin/productos/nuevo', 'Acceso administrador'],
+  ['/#/admin/categorias', 'Acceso administrador'],
+  ['/#/admin/inventario', 'Acceso administrador'],
+  ['/#/admin/pedidos', 'Acceso administrador'],
+  ['/#/admin/pedidos/o1', 'Acceso administrador'],
+  ['/#/admin/configuracion', 'Acceso administrador'],
   ['/#/no-existe', 'Página no encontrada'],
 ]
 

@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
+import { Field, inputClass } from '../../../components/Field'
 import { Loading, LoadError } from '../../../components/QueryState'
 import { btnPrimary } from '../../../components/ui'
 import { usePageTitle } from '../../../hooks/usePageTitle'
@@ -14,33 +15,7 @@ import { createOrder, OrderError } from '../api'
 import { makeCheckoutSchema, maxRequestedDate, minRequestedDate, type CheckoutValues } from '../schema'
 import { attemptKey, clearAttempt, saveExtras } from '../session'
 
-const input = 'min-h-12 w-full rounded-xl border bg-white px-4'
-
-function Field({
-  id,
-  label,
-  error,
-  children,
-}: {
-  id: string
-  label: string
-  error?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="mb-4 flex flex-col gap-1">
-      <label htmlFor={id} className="font-semibold">
-        {label}
-      </label>
-      {children}
-      {error && (
-        <span id={`${id}-error`} role="alert" className="text-sm text-danger">
-          {error}
-        </span>
-      )}
-    </div>
-  )
-}
+const input = inputClass
 
 export function CheckoutPage() {
   usePageTitle('Checkout')

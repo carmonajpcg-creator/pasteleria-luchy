@@ -4,6 +4,22 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
+**Fase 7 — Administración: implementada y probada; PENDIENTE de revisión Opus** (CLAUDE.md §9 y §11: permisos, dinero e inventario). No se da por cerrada hasta esa revisión. Resultados del 2026-10-20:
+
+- **Panel `/admin`** con carga diferida (el sitio público no descarga nada del panel): acceso con correo y contraseña (Supabase Auth), panel con pedidos por estado, ventas confirmadas, pagos registrados y stock bajo; bandeja de pedidos con búsqueda por folio; detalle con confirmar, preparación, listo, entregado y cancelar con motivo; pagos manuales con saldo; inventario con ajustes y movimientos auditados; CRUD de categorías y productos (los productos se desactivan, no se borran) con imágenes; configuración (WhatsApp con confirmación, zona horaria, caducidad).
+- **Seguridad**: la autorización real está en RLS y en las RPC (`require_admin`); el panel solo decide qué pantalla mostrar. Sin sesión no se hace ninguna petición privada; un usuario sin rol ve «Sin permisos». Registro público de Auth **desactivado** (no hay cuentas de cliente). `noindex` en el panel. Los errores de la BD se traducen sin mostrar detalles internos.
+- **Pruebas**: pgTAP 77 (33 de la fase + 44 previas), Vitest 99, Playwright 147 correctas y 1 omitida (teclado en móvil), lint, typecheck y build limpios; axe WCAG A/AA sin violaciones en las 9 pantallas del panel y sin desbordamiento horizontal.
+- **Verificación real** contra `luchy-pruebas` (40 comprobaciones): inicio de sesión admin; pedido público → confirmar (stock −3) → doble confirmación simultánea sin doble descuento → anticipo (`partial`) → reembolso excesivo rechazado → transición inválida rechazada → cancelar repone stock; ajustes de inventario; producto creado/desactivado y su visibilidad pública; imagen PNG subida y eliminada, GIF y archivo de más de 2 MB rechazados por el servidor; el anónimo no puede subir imágenes, ver pedidos ni editar la configuración. Todo lo de prueba se borró (stock final 12).
+- **Cambio de requisito justificado**: el test E01 de rutas del panel pasó de «muestra un marcador» a «sin sesión redirige al login».
+- Puntos para la revisión Opus: `admin_dashboard()`, tabla de transiciones del cliente frente a `advance_order`, subida de archivos (ruta aleatoria, MIME y tamaño), manejo de sesión y caché al cerrar sesión, `ilike` de folio saneado, borrado de categorías, y el procedimiento de alta de administradores.
+- Pendientes: fotos con licencia; recuperación de contraseña por correo (se restablece desde el panel de Supabase); límite por IP del login (lo gestiona Supabase Auth).
+
+### Crear un administrador (proyecto de pruebas y producción)
+
+No hay autoasignación de roles. Crear el usuario en *Authentication → Users* de Supabase (o con la API de administración) y, desde el SQL Editor con el rol `postgres`: `insert into public.profiles (user_id, role) values ('<uuid del usuario>', 'admin');`. El registro público está desactivado en `supabase/config.toml` (`enable_signup = false`); para aplicarlo en un proyecto nuevo: `supabase config push`. La cuenta del proyecto de pruebas usa `carmona.jpcg@gmail.com`; su contraseña está solo en variables de usuario de Windows, no en el repositorio.
+
+## Fase 6 — Carrito y WhatsApp (completada con revisión Opus)
+
 **Fase 6 — Carrito y WhatsApp: completada con revisión Opus** (2026-10-20). Hallazgos de la revisión y su corrección:
 
 | # | Hallazgo | Severidad | Corrección |

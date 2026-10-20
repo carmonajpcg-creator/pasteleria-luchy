@@ -78,6 +78,12 @@ Reglas: dinero en centavos enteros; totales siempre calculados en BD; RLS en tod
 | D9 | `stock_quantity` sin grant de escritura: solo cambia por RPC con movimiento auditado | Evita ajustes sin rastro y dobles descuentos. |
 | D10 | `store_settings.timezone` por defecto `'UTC'`; la tienda (Piedras Negras, Coahuila) usa `America/Matamoros` | Define la fecha mínima de entrega en servidor y cliente. La ciudad la indicó la persona dueña del proyecto (2026-10-20); cobertura y horarios siguen pendientes (CLAUDE.md §14). |
 | D11 | Semillas: pasteles y caja surtida `made_to_order`, el resto `stock` con 12 unidades | Suposición de demo; política real pendiente. |
+| D12 | El panel `/admin` se carga bajo demanda (`React.lazy`) y envuelve su propia sesión (`AuthProvider` solo bajo `/admin`) | El sitio público no descarga código del panel ni abre sesiones. |
+| D13 | Registro público de Auth desactivado; los administradores se crean a mano y su rol se inserta en `profiles` | No hay cuentas de cliente (CLAUDE.md §5); evita altas anónimas aunque RLS ya les niega todo. |
+| D14 | Los productos y pagos nunca se borran: los productos se desactivan y los errores de pago se corrigen con un reembolso | Preserva historial y auditoría; `order_items` guarda snapshots. |
+| D15 | `admin_dashboard()` agrega en el servidor ventas confirmadas, pagos netos, conteos por estado y stock bajo | La lógica de dinero no se calcula con filas traídas al navegador. |
+| D16 | Pesos ↔ centavos con análisis de texto (`parsePesos`), nunca con flotantes; la UI solo captura/muestra pesos | CLAUDE.md §7: no confiar en cálculos JS para precios persistidos. |
+| D17 | Imágenes de producto con ruta aleatoria (`products/<id>/<uuid>.<ext>`), MIME y 2 MB validados en cliente y en el bucket | No se conserva el nombre original; el servidor es la validación definitiva. |
 
 ## 6. Backlog por fase
 

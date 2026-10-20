@@ -73,7 +73,11 @@ Reglas: dinero en centavos enteros; totales siempre calculados en BD; RLS en tod
 | D4 | Precios en **centavos enteros** | Evita errores de punto flotante. |
 | D5 | Productos `made_to_order` no descuentan stock físico; usan capacidad/anticipación | Política final pendiente (CLAUDE.md §14). |
 | D6 | Idempotencia con `idempotency_key` generado en cliente, único en BD | Reintentos y doble clic no duplican pedidos. |
-| D7 | Antispam: límite por IP en Edge Function + caducidad de pedidos no confirmados | A definir en Fase 6/9. |
+| D7 | Antispam: límite por IP en Edge Function + caducidad de pedidos no confirmados | A definir en Fase 6/9. Fase 4 añade un tope de 5 pedidos pendientes por teléfono y hora, y `expire_pending_orders()`. |
+| D8 | El público lee productos solo por la vista `catalog_products` (disponibilidad booleana, sin cifra de stock) | No exponer inventario exacto; `products` queda solo para admin. |
+| D9 | `stock_quantity` sin grant de escritura: solo cambia por RPC con movimiento auditado | Evita ajustes sin rastro y dobles descuentos. |
+| D10 | `store_settings.timezone = 'UTC'` como valor neutro | Zona horaria pendiente (CLAUDE.md §14); afecta el cálculo de fecha mínima. |
+| D11 | Semillas: pasteles y caja surtida `made_to_order`, el resto `stock` con 12 unidades | Suposición de demo; política real pendiente. |
 
 ## 6. Backlog por fase
 

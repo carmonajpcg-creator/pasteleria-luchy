@@ -4,7 +4,32 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 3 — Configuración técnica** (Fases 1 y 2 completadas). La app arranca con rutas y diseño base; las pantallas son marcadores de posición hasta las Fases 5–7. Aún no hay backend (Fase 4).
+**Fase 4 — Base de datos y Supabase: completada** (Fases 1–3 completadas). Migraciones y semillas aplicadas en el proyecto Supabase Cloud de pruebas `luchy-pruebas` (ref `qqstdkfnsnoivumakwza`, us-east-1). Resultados del 2026-10-19:
+
+- 37/37 pruebas pgTAP correctas (`npm run test:db`).
+- Sondeo de la API REST con clave pública: `anon` lee `catalog_products` (20) y la configuración pública. Obtiene 401 en `products`, `orders`, `store_settings.timezone` y `confirm_order`. `get_order_public` con token falso devuelve `null`.
+- Sin regresiones: Vitest 5/5, build y Playwright 43 correctas (1 omitida).
+- Siguiente: Fase 5 (catálogo), asignada a Sonnet.
+
+## Base de datos (Fase 4)
+
+| Archivo | Contenido |
+|---|---|
+| `supabase/migrations/…_esquema.sql` | Tablas, enums, pagos y movimientos solo de inserción, `payment_status` automático |
+| `supabase/migrations/…_rls.sql` | Grants mínimos, RLS por rol, vista pública `catalog_products` (sin cifras de stock) |
+| `supabase/migrations/…_rpc.sql` | `create_order` (idempotente, recalcula precios), `get_order_public` (folio + token), `confirm_order`, `advance_order`, `cancel_order`, `adjust_stock`, `expire_pending_orders` |
+| `supabase/migrations/…_storage.sql` | Bucket `product-images` (JPEG/PNG/WebP, 2 MB, escritura solo admin) |
+| `supabase/seed.sql` | 5 categorías y 20 productos ficticios con precios provisionales |
+| `supabase/tests/database/` | 37 pruebas pgTAP: anon, usuario sin rol, admin, idempotencia, stock |
+
+Se trabaja con **Supabase Cloud** (sin Docker). Contra un proyecto **de pruebas**:
+
+1. Variables de usuario (fuera del repo): `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` y `SUPABASE_DB_URL` (cadena *Session pooler*).
+2. `npx supabase link --project-ref <ref>`
+3. `npx supabase db push --include-seed`
+4. `npm run test:db`: ejecuta las pruebas pgTAP con `scripts/test-db.mjs`, cada archivo dentro de una transacción revertida. `supabase test db` requiere Docker, por eso no se usa.
+
+**Crear un administrador:** no hay autoasignación. Crear el usuario en Supabase Auth y, desde el SQL Editor (rol `postgres`), ejecutar `insert into public.profiles (user_id, role) values ('<uuid>', 'admin');`.
 
 ## Requisitos
 

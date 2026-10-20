@@ -1,10 +1,10 @@
-﻿# PastelerÃ­a Luchy
+﻿# Pastelería Luchy
 
-Tienda web de reposterÃ­a (espaÃ±ol MX, MXN) con catÃ¡logo, carrito y pedido por WhatsApp. Nombre provisional.
+Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por WhatsApp. Nombre provisional.
 
 ## Estado
 
-**Fase 1 â€” PlaneaciÃ³n y arquitectura** (documental). AÃºn no hay aplicaciÃ³n; las pruebas E2E estÃ¡n diseÃ±adas en [docs/arquitectura.md](docs/arquitectura.md) y su ejecuciÃ³n queda pendiente hasta la Fase 3.
+**Fase 2 — Diseño UI/UX** (Fase 1 completada). Aún no hay aplicación: hay prototipos estáticos en `design/prototipos/` (abrir `index.html`). Las pruebas E2E están diseñadas en [docs/arquitectura.md](docs/arquitectura.md) y su ejecución queda pendiente hasta la Fase 3.
 
 ## Documentos
 
@@ -14,5 +14,4 @@ Tienda web de reposterÃ­a (espaÃ±ol MX, MXN) con catÃ¡logo, carrito y pedi
 
 ## Pendientes antes de lanzamiento
 
-Ver CLAUDE.md Â§14 (nÃºmero de WhatsApp, cobertura, horarios, precios, polÃ­ticas, dominio).
-
+Ver CLAUDE.md §14 (número de WhatsApp, cobertura, horarios, precios, políticas, dominio).

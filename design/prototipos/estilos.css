@@ -42,6 +42,7 @@ nav.main a[aria-current="page"] { background: var(--purple-100); color: var(--pu
 .chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--text); text-decoration: none; }
 .chip[aria-pressed="true"], .chip.active { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); padding: 0; list-style: none; margin: 0; }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; height: 100%; }
 .card .ph { aspect-ratio: 4/3; background: linear-gradient(135deg, var(--purple-400), var(--green-300)); display: grid; place-items: center; color: var(--text); font-size: .8rem; font-weight: 600; text-align: center; padding: 8px; }
 .card .body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
@@ -55,6 +56,7 @@ nav.main a[aria-current="page"] { background: var(--purple-100); color: var(--pu
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .field label { font-weight: 600; }
 .field input, .field select, .field textarea { min-height: var(--tap); padding: 10px 14px; border: 1.5px solid #8B7A9B; border-radius: var(--radius-sm); font: inherit; background: var(--surface); color: var(--text); }
+.field [aria-invalid="true"] { border-color: var(--danger); border-width: 2px; }
 .field .error { color: var(--danger); font-size: .9rem; }
 .panel { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
 .two { display: grid; gap: 24px; }
@@ -63,6 +65,7 @@ nav.main a[aria-current="page"] { background: var(--purple-100); color: var(--pu
 /* Carrito */
 .line { display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .line .ph { width: 64px; height: 64px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-400), var(--green-300)); }
+.link-btn { background: none; border: 0; padding: 0; min-height: 44px; color: var(--danger); font: 600 .9rem var(--font-body); text-decoration: underline; cursor: pointer; }
 .qty { display: inline-flex; align-items: center; gap: 4px; }
 .qty button { width: var(--tap); height: var(--tap); border-radius: 50%; border: 1.5px solid var(--purple-600); background: var(--surface); color: var(--purple-700); font-size: 1.2rem; cursor: pointer; }
 .total { display: flex; justify-content: space-between; font: 700 1.2rem var(--font-heading); padding-top: 12px; }

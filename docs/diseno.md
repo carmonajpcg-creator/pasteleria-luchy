@@ -41,4 +41,24 @@ Inicio, catálogo (búsqueda + filtros), detalle de producto (con personalizaci�
 
 - Capturas con Playwright (Edge, móvil 390×844 y escritorio 1280×800) de las 4 pantallas: 0 errores de consola, sin desbordamiento horizontal.
 - Se detectaron y corrigieron: cabecera descuadrada en móvil y título pegado a la cabecera.
-- **No realizado:** auditoría automatizada con axe, lector de pantalla, línea base de regresión visual versionada (Playwright no forma parte aún del proyecto; se instala en la Fase 3) y revisión Opus del diseño.
+- Auditoría automatizada axe-core (WCAG 2.0/2.1 A y AA) en las 4 pantallas: **0 violaciones**. Primer foco de teclado: «Saltar al contenido».
+- **No realizado:** prueba con lector de pantalla y línea base de regresión visual versionada (Playwright se instala en el proyecto en la Fase 3).
+
+## Revisión Opus (2026-10-19)
+
+Hallazgos y resolución:
+
+| # | Hallazgo | Severidad | Estado |
+|---|---|---|---|
+| R1 | Botón «Enviar pedido por WhatsApp» sugería que la web envía el mensaje; el aviso estaba *después* del botón | Alta (regla de negocio) | Corregido: «Continuar a WhatsApp», aviso antes del botón y asociado con `aria-describedby` |
+| R2 | Aviso de privacidad solo al final del formulario; CLAUDE.md exige informarlo antes de recopilar datos | Alta (privacidad) | Corregido: aviso al inicio de «Tus datos» + casilla de consentimiento |
+| R3 | Carrito sin acción «Eliminar» (requisito MVP) | Media | Corregido |
+| R4 | Tarjetas del catálogo sin la leyenda «Precio provisional» | Media | Corregido |
+| R5 | Error de teléfono sin `aria-invalid`/`aria-describedby` ni borde de error | Media (a11y) | Corregido |
+| R6 | Cuadrícula de 6 columnas estrechas en escritorio | Baja | Corregido: 2 columnas en móvil, mínimo 220 px desde 640 px |
+| R7 | «Agregar al carrito» era un enlace, no un botón | Baja | Corregido |
+| R8 | Productos bajo pedido no indican fecha más próxima | Media | Placeholder; depende de la política de anticipación (Fase 8, CLAUDE.md §14) |
+| R9 | `input type=number` para cantidad en detalle vs. botones −/+ en carrito | Baja | Unificar al selector −/+ al implementar en Fase 5 |
+| R10 | «Carrito (2)» se anuncia como número suelto | Baja | Implementar como «Carrito, 2 productos» (etiqueta accesible) en Fase 5 |
+
+Veredicto: sistema visual **aprobado para pasar a Fase 3**, con R8–R10 registrados como pendientes de implementación.

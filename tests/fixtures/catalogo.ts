@@ -43,6 +43,7 @@ const settings = {
   contact_phone: null,
   schedule_text: null,
   coverage_text: null,
+  timezone: 'UTC',
 }
 
 export const fixtures = { categories, products, settings }

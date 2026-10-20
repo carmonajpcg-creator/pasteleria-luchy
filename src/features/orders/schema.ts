@@ -3,11 +3,20 @@ import { parseIsoDate, toIsoDate } from '../../lib/dates'
 
 export const MAX_DAYS_AHEAD = 90
 
-/** Fecha mínima orientativa (hora local del navegador). La regla real vive en create_order. */
-export function minRequestedDate(maxLeadHours: number, now = new Date()): string {
-  const d = new Date(now)
-  d.setDate(d.getDate() + Math.ceil(maxLeadHours / 24))
-  return toIsoDate(d)
+/**
+ * Fecha mínima con la misma regla que create_order: la fecha, en la zona horaria de la tienda,
+ * del instante «ahora + anticipación». La validación definitiva sigue siendo la del servidor.
+ */
+export function minRequestedDate(maxLeadHours: number, timeZone: string, now = new Date()): string {
+  const target = new Date(now.getTime() + maxLeadHours * 3_600_000)
+  try {
+    // en-CA formatea como YYYY-MM-DD.
+    return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+      target,
+    )
+  } catch {
+    return toIsoDate(target) // zona inválida: hora local; el servidor decide
+  }
 }
 
 export function maxRequestedDate(minDate: string): string {

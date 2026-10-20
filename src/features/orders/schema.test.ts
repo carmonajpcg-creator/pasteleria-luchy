@@ -41,11 +41,20 @@ describe('esquema de checkout', () => {
 })
 
 describe('fechas de pedido', () => {
-  it('suma días de anticipación redondeando hacia arriba', () => {
-    const now = new Date(2026, 9, 20, 15, 0) // 20/oct/2026 local
-    expect(minRequestedDate(0, now)).toBe('2026-10-20')
-    expect(minRequestedDate(48, now)).toBe('2026-10-22')
-    expect(minRequestedDate(25, now)).toBe('2026-10-22')
+  // Misma regla que create_order: ((now() + anticipación) at time zone tz)::date
+  it('usa la zona horaria de la tienda, no la del navegador', () => {
+    const now = new Date('2026-10-21T01:30:00Z') // 20/oct 19:30 en Ciudad de México
+    expect(minRequestedDate(0, 'UTC', now)).toBe('2026-10-21')
+    expect(minRequestedDate(0, 'America/Mexico_City', now)).toBe('2026-10-20')
+  })
+  it('suma la anticipación en horas', () => {
+    const now = new Date('2026-10-20T15:00:00Z')
+    expect(minRequestedDate(48, 'UTC', now)).toBe('2026-10-22')
+    expect(minRequestedDate(25, 'UTC', now)).toBe('2026-10-21')
+    expect(minRequestedDate(9, 'UTC', now)).toBe('2026-10-21')
+  })
+  it('una zona inválida no rompe la app', () => {
+    expect(minRequestedDate(0, 'No/Existe', new Date(2026, 9, 20, 12))).toBe('2026-10-20')
   })
   it('el máximo es 90 días después del mínimo', () => {
     expect(maxRequestedDate('2026-11-01')).toBe('2027-01-30')

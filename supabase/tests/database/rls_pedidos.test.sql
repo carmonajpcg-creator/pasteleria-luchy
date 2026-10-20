@@ -24,7 +24,7 @@ select throws_ok('select * from public.orders', '42501', null, 'anon no lee pedi
 select throws_ok('select * from public.payments', '42501', null, 'anon no lee pagos');
 select throws_ok($$update public.categories set name = 'x'$$, '42501', null, 'anon no edita categorías');
 select lives_ok('select store_name, whatsapp_number from public.store_settings', 'anon lee la configuración pública');
-select throws_ok('select timezone from public.store_settings', '42501', null, 'anon no lee parámetros internos');
+select throws_ok('select order_expiry_hours from public.store_settings', '42501', null, 'anon no lee parámetros internos');
 
 select ok(
   (select set_config('test.folio', r.folio, false) || set_config('test.token', r.public_token, false)

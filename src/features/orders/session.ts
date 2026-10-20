@@ -23,17 +23,29 @@ function write(key: string, value: unknown) {
   }
 }
 
+// Solo se guarda un SHA-256 del contenido, nunca nombre, teléfono o notas en claro.
+async function sha256(text: string): Promise<string | null> {
+  const subtle = globalThis.crypto?.subtle
+  if (!subtle) return null
+  const digest = await subtle.digest('SHA-256', new TextEncoder().encode(text))
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
 /**
  * Clave de idempotencia estable mientras no cambie el contenido del pedido: un reintento tras un
  * fallo de red o un doble clic reutiliza la clave y no duplica el pedido. Si el carrito o los datos
  * cambian, se genera otra, para no devolver un pedido con contenido distinto.
  */
-export function attemptKey(fingerprint: string): string {
+export async function attemptKey(content: unknown): Promise<string> {
+  const text = JSON.stringify(content)
+  const hash = await sha256(text)
+  // Sin WebCrypto (contexto no seguro) la huella solo vive en memoria.
+  const fingerprint = hash ?? text
   const stored = memoryAttempt ?? read<{ fingerprint: string; key: string }>(ATTEMPT_KEY)
   if (stored && stored.fingerprint === fingerprint) return stored.key
   const next = { fingerprint, key: crypto.randomUUID() }
   memoryAttempt = next
-  write(ATTEMPT_KEY, next)
+  if (hash) write(ATTEMPT_KEY, next)
   return next.key
 }
 

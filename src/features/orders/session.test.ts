@@ -5,24 +5,28 @@ beforeEach(() => {
   clearAttempt()
 })
 
+const pedido = (n: number) => ({ items: [{ productId: 'a', quantity: n }], values: { name: 'Ana López', phone: '5512345678' } })
+
 describe('clave de idempotencia', () => {
-  it('reutiliza la clave mientras el contenido del pedido no cambie', () => {
-    const first = attemptKey('pedido-1')
-    expect(attemptKey('pedido-1')).toBe(first)
+  it('reutiliza la clave mientras el contenido del pedido no cambie', async () => {
+    const first = await attemptKey(pedido(1))
+    expect(await attemptKey(pedido(1))).toBe(first)
     expect(first).toMatch(/^[0-9a-f-]{36}$/)
   })
-  it('genera otra clave si el contenido cambia', () => {
-    const first = attemptKey('pedido-1')
-    expect(attemptKey('pedido-2')).not.toBe(first)
+  it('genera otra clave si el contenido cambia', async () => {
+    const first = await attemptKey(pedido(1))
+    expect(await attemptKey(pedido(2))).not.toBe(first)
   })
-  it('sobrevive a una recarga (sessionStorage) y se renueva tras un pedido exitoso', () => {
-    const first = attemptKey('pedido-1')
-    expect(JSON.parse(sessionStorage.getItem('luchy-order-attempt') as string)).toEqual({
-      fingerprint: 'pedido-1',
-      key: first,
-    })
+  it('guarda solo un hash: nunca datos personales en claro', async () => {
+    const key = await attemptKey(pedido(1))
+    const raw = sessionStorage.getItem('luchy-order-attempt') as string
+    expect(raw).not.toMatch(/Ana|5512345678/)
+    expect(JSON.parse(raw)).toEqual({ fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/), key })
+  })
+  it('sobrevive a una recarga y se renueva tras un pedido exitoso', async () => {
+    const first = await attemptKey(pedido(1))
     clearAttempt()
-    expect(attemptKey('pedido-1')).not.toBe(first)
+    expect(await attemptKey(pedido(1))).not.toBe(first)
   })
 })
 

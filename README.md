@@ -4,7 +4,22 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 6 — Carrito y WhatsApp: implementada y probada; PENDIENTE de revisión Opus** (CLAUDE.md §9 y §11: toca dinero, inventario y datos personales). No se da por cerrada hasta esa revisión. Resultados del 2026-10-20:
+**Fase 6 — Carrito y WhatsApp: completada con revisión Opus** (2026-10-20). Hallazgos de la revisión y su corrección:
+
+| # | Hallazgo | Severidad | Corrección |
+|---|---|---|---|
+| H1 | Fecha mínima del navegador (hora local, días) distinta a la del servidor (zona de la tienda, horas): rechazos inesperados por la tarde | Media | La zona horaria es pública y el cliente aplica la misma regla que `create_order` |
+| H2 | Antispam comparaba el teléfono tal como se escribió; el servidor aceptaba teléfonos sin dígitos | Media | Comparación normalizada a dígitos e índice; mínimo 8 dígitos en el servidor |
+| H3 | `expire_pending_orders()` nunca se ejecutaba | Media | Programada cada hora con `pg_cron` |
+| H4 | La huella de idempotencia guardaba nombre/teléfono/notas en `sessionStorage` | Baja | Solo se guarda un SHA-256; candado síncrono contra doble envío |
+
+Verificado tras las correcciones: pgTAP 44/44 (`20260101000400_revision_fase6.sql` aplicada en `luchy-pruebas`), Vitest 47/47, Playwright 97 correctas y 1 omitida, y prueba real (fecha mínima aceptada por el servidor, doble clic = 1 pedido, 0 aperturas a `wa.me`; pedido de prueba borrado).
+
+Sin hallazgo: precios y total solo del servidor, sin descuento de stock al crear, idempotencia ante concurrencia, token en el fragmento `#` (no viaja a servidores ni en `Referer`).
+
+Pendientes conscientes: límite por IP (Edge Function, D7) y **zona horaria real de la tienda** (`store_settings.timezone` sigue en `UTC`, CLAUDE.md §14).
+
+Detalle de la implementación (2026-10-20):
 
 - Carrito local (Zustand, persiste solo producto/cantidad/personalización), checkout con React Hook Form + Zod, `create_order` idempotente, página `/pedido/:folio?t=<token>` y enlace `wa.me` con el mensaje codificado.
 - Vitest 44/44, lint y typecheck limpios, build correcto. Playwright 97 correctas y 1 omitida (teclado en móvil): cantidades, totales, validaciones, doble clic, reintento con la misma clave, cambio de carrito con otra clave, error de negocio, token inválido, axe y desbordamiento. El cliente nunca envía precios ni totales (verificado en la petición).

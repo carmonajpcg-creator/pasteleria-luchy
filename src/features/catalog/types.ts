@@ -41,4 +41,5 @@ export interface PublicStoreSettings {
   contact_phone: string | null
   schedule_text: string | null
   coverage_text: string | null
+  timezone: string
 }

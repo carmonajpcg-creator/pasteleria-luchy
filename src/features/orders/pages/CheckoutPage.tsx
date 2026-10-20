@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { Loading, LoadError } from '../../../components/QueryState'
 import { btnPrimary } from '../../../components/ui'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { formatMXN } from '../../../lib/money'
+import { useStoreSettings } from '../../catalog/hooks'
 import { useCart } from '../../cart/store'
 import { useCartLines } from '../../cart/useCartLines'
 import { createOrder, OrderError } from '../api'
@@ -46,15 +47,18 @@ export function CheckoutPage() {
   const navigate = useNavigate()
   const clearCart = useCart((s) => s.clear)
   const { items, lines, missing, unavailable, totalCents, products } = useCartLines()
+  const settings = useStoreSettings()
+  const submitting = useRef(false)
 
   const maxLead = Math.max(0, ...lines.map((l) => l.product.lead_time_hours))
-  const minDate = minRequestedDate(maxLead)
+  // Si la configuración no carga se usa UTC (valor por defecto de la tienda); el servidor decide.
+  const minDate = minRequestedDate(maxLead, settings.data?.timezone ?? 'UTC')
   const schema = useMemo(() => makeCheckoutSchema(minDate), [minDate])
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<CheckoutValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: '', phone: '', email: '', fulfillment: 'pickup', requestedDate: '', notes: '', privacy: false },
@@ -76,25 +80,38 @@ export function CheckoutPage() {
     },
   })
 
-  const onSubmit = handleSubmit((values) => {
-    if (mutation.isPending) return
-    const orderItems = lines
-      .map((l) => ({ productId: l.product.id, quantity: l.item.quantity, customization: l.item.customization }))
-      .sort((a, b) => a.productId.localeCompare(b.productId))
-    // Mismo contenido → misma clave (reintentos y doble clic no duplican el pedido).
-    const idempotencyKey = attemptKey(JSON.stringify({ orderItems, values }))
-    mutation.mutate({
-      idempotencyKey,
-      name: values.name,
-      phone: values.phone,
-      email: values.email,
-      fulfillment: values.fulfillment,
-      requestedDate: values.requestedDate,
-      notes: values.notes,
-      privacyAccepted: values.privacy,
-      items: orderItems,
-    })
+  const onSubmit = handleSubmit(async (values) => {
+    try {
+      const orderItems = lines
+        .map((l) => ({ productId: l.product.id, quantity: l.item.quantity, customization: l.item.customization }))
+        .sort((a, b) => a.productId.localeCompare(b.productId))
+      // Mismo contenido → misma clave (reintentos y doble clic no duplican el pedido).
+      const idempotencyKey = await attemptKey({ orderItems, values })
+      await mutation.mutateAsync({
+        idempotencyKey,
+        name: values.name,
+        phone: values.phone,
+        email: values.email,
+        fulfillment: values.fulfillment,
+        requestedDate: values.requestedDate,
+        notes: values.notes,
+        privacyAccepted: values.privacy,
+        items: orderItems,
+      })
+    } catch {
+      /* el error se muestra desde mutation.error */
+    }
   })
+
+  // Candado síncrono: un segundo clic llega antes de que el botón se vuelva a pintar deshabilitado.
+  const submitOnce = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (submitting.current) return
+    submitting.current = true
+    void onSubmit(e).finally(() => {
+      submitting.current = false
+    })
+  }
 
   if (items.length === 0) {
     return (
@@ -165,7 +182,7 @@ export function CheckoutPage() {
             antes de continuar.
           </p>
 
-          <form onSubmit={(e) => void onSubmit(e)} noValidate>
+          <form onSubmit={submitOnce} noValidate>
             <Field id="name" label="Nombre" error={errors.name?.message}>
               <input
                 id="name"
@@ -274,11 +291,11 @@ export function CheckoutPage() {
 
             <button
               type="submit"
-              disabled={mutation.isPending || blocked}
+              disabled={isSubmitting || blocked}
               aria-describedby="wa-note"
               className={`${btnPrimary} w-full disabled:opacity-60`}
             >
-              {mutation.isPending ? 'Registrando…' : 'Registrar pedido'}
+              {isSubmitting ? 'Registrando…' : 'Registrar pedido'}
             </button>
           </form>
         </section>

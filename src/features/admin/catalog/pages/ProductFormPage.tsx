@@ -137,7 +137,10 @@ function ProductForm({ product }: { product: AdminProduct | null }) {
         <div className="mb-4 grid gap-3">
           <label className="flex items-start gap-3">
             <input type="checkbox" className="mt-1 size-6" {...register('allergensVerified')} />
-            <span>La tienda verificó esta información de alérgenos (si no, la tienda muestra «por verificar»)</span>
+            <span>
+              La tienda verificó esta información de alérgenos. Sin marcar, la tienda muestra «por verificar»; marcada y
+              sin alérgenos, muestra «ninguno declarado por la tienda».
+            </span>
           </label>
           <label className="flex items-center gap-3">
             <input type="checkbox" className="size-6" {...register('featured')} />

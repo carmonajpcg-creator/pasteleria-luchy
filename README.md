@@ -4,7 +4,19 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 7 — Administración: implementada y probada; PENDIENTE de revisión Opus** (CLAUDE.md §9 y §11: permisos, dinero e inventario). No se da por cerrada hasta esa revisión. Resultados del 2026-10-20:
+**Fase 7 — Administración: completada con revisión Opus** (2026-10-20). Hallazgos y corrección:
+
+| # | Hallazgo | Severidad | Corrección |
+|---|---|---|---|
+| H1 | El cliente de Supabase es único: con sesión de admin, la tienda pública recibía de RLS también las categorías inactivas | Media | La tienda filtra `active = true` explícitamente; prueba E2E con sesión de admin y prueba pgTAP |
+| H2 | Alérgenos «verificados» sin lista se mostraban como «por verificar», contradiciendo al panel | Media | La tienda muestra «ninguno declarado por la tienda»; el panel explica los tres casos |
+| H3 | La zona horaria solo se validaba en el formulario; un valor inválido rompería todos los pedidos con un error técnico visible | Media-baja | Disparador `store_settings_validate` (zona existente y caducidad ≤ 720 h), migración `20260101000600_revision_fase7.sql` |
+| H4 | La bandeja de pedidos se cortaba en 100 sin avisar | Baja | Aviso visible y la búsqueda por folio sigue alcanzando pedidos antiguos |
+| H5 | Sin política de contenido (CSP): el token del admin vive en `localStorage` | Baja ahora | **Pendiente para la Fase 9** (CSP por `<meta>`, GitHub Pages no admite cabeceras) |
+
+Sin hallazgo: confirmación y cancelación concurrentes, pagos y movimientos solo de inserción, stock sin escritura directa, subida de archivos, redirección del login, mensajes de error y cierre de sesión. Tras las correcciones: pgTAP 82/82, Vitest 99/99, Playwright 153 correctas y 1 omitida, lint y typecheck limpios.
+
+Detalle de la implementación (2026-10-20):
 
 - **Panel `/admin`** con carga diferida (el sitio público no descarga nada del panel): acceso con correo y contraseña (Supabase Auth), panel con pedidos por estado, ventas confirmadas, pagos registrados y stock bajo; bandeja de pedidos con búsqueda por folio; detalle con confirmar, preparación, listo, entregado y cancelar con motivo; pagos manuales con saldo; inventario con ajustes y movimientos auditados; CRUD de categorías y productos (los productos se desactivan, no se borran) con imágenes; configuración (WhatsApp con confirmación, zona horaria, caducidad).
 - **Seguridad**: la autorización real está en RLS y en las RPC (`require_admin`); el panel solo decide qué pantalla mostrar. Sin sesión no se hace ninguna petición privada; un usuario sin rol ve «Sin permisos». Registro público de Auth **desactivado** (no hay cuentas de cliente). `noindex` en el panel. Los errores de la BD se traducen sin mostrar detalles internos.

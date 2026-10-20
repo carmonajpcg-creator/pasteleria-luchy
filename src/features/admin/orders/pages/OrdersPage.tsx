@@ -6,7 +6,7 @@ import { usePageTitle } from '../../../../hooks/usePageTitle'
 import { formatDate } from '../../../../lib/dates'
 import { formatMXN } from '../../../../lib/money'
 import { fulfillmentLabel, paymentLabel, statusLabel, type OrderStatus } from '../../../orders/types'
-import { listOrders } from '../api'
+import { listOrders, ORDERS_PAGE_LIMIT } from '../api'
 
 const STATUSES = Object.keys(statusLabel) as OrderStatus[]
 
@@ -73,7 +73,9 @@ export function OrdersPage() {
       {orders.data && (
         <>
           <p role="status" className="mb-3 text-muted">
-            {orders.data.length} {orders.data.length === 1 ? 'pedido' : 'pedidos'}
+            {orders.data.length === ORDERS_PAGE_LIMIT
+              ? `Mostrando los ${ORDERS_PAGE_LIMIT} pedidos más recientes. Usa la búsqueda por folio o el filtro de estado para ver otros.`
+              : `${orders.data.length} ${orders.data.length === 1 ? 'pedido' : 'pedidos'}`}
           </p>
           {orders.data.length === 0 ? (
             <p className="rounded-card bg-white p-6 shadow-card">No hay pedidos con esos filtros.</p>

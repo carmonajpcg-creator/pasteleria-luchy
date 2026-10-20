@@ -20,7 +20,7 @@ const products = [
   },
   {
     ...base, id: 'p3', slug: 'cupcake-vainilla', sku: 'CUP-001', name: 'Cupcake de vainilla',
-    description: 'Cupcake de vainilla con betún.', price_cents: 4500, lead_time_hours: 0,
+    description: 'Cupcake de vainilla con betún.', price_cents: 4500, lead_time_hours: 0, allergens_verified: true,
     fulfillment_type: 'stock', category_id: 'c2', category_slug: 'cupcakes', category_name: 'Cupcakes',
   },
   {

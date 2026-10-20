@@ -65,8 +65,10 @@ export interface OrderFilters {
   query: string
 }
 
+export const ORDERS_PAGE_LIMIT = 100
+
 export async function listOrders({ status, query }: OrderFilters): Promise<OrderSummary[]> {
-  let q = db().from('orders').select(SUMMARY).order('created_at', { ascending: false }).limit(100)
+  let q = db().from('orders').select(SUMMARY).order('created_at', { ascending: false }).limit(ORDERS_PAGE_LIMIT)
   if (status) q = q.eq('status', status)
   // Solo caracteres válidos de un folio: evita comodines y símbolos en el patrón ilike.
   const folio = query.trim().replace(/[^A-Za-z0-9-]/g, '')

@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(33);
+select plan(38);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin@test.local'),
@@ -95,6 +95,18 @@ select ok(jsonb_array_length(public.admin_dashboard()->'low_stock') >= 0, 'dashb
 select is(public.cancel_order('11111111-0000-0000-0000-000000000001', 'Prueba admin')::text, 'cancelled', 'admin cancela');
 select is((select public.admin_dashboard()->>'confirmed_sales_cents')::bigint, 0::bigint,
   'cancelar quita el pedido de las ventas confirmadas');
+
+-- Revisión Opus (H1, H3): validación en la BD y lo que RLS le devuelve a un admin en consultas públicas.
+select throws_ok($$update public.store_settings set timezone = 'No/Existe'$$, '22023', null,
+  'una zona horaria inválida se rechaza en la BD');
+select throws_ok($$update public.store_settings set order_expiry_hours = 721$$, '22023', null,
+  'la caducidad no supera 720 horas');
+select lives_ok($$update public.store_settings set timezone = 'America/Matamoros'$$, 'una zona válida se acepta');
+update public.categories set active = false where slug = 'galletas';
+select ok((select count(*) from public.categories where not active) >= 1,
+  'RLS sí le devuelve categorías inactivas al admin (por eso la tienda filtra active = true)');
+select is((select count(*) from public.categories where active and slug = 'galletas'), 0::bigint,
+  'con el filtro explícito la categoría inactiva no aparece');
 
 select * from finish();
 rollback;

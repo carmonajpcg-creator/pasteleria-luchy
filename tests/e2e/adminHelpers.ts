@@ -96,6 +96,8 @@ export interface AdminOptions {
   uploadFails?: boolean
   /** Retraso de confirm_order, para probar dobles clics. */
   confirmDelayMs?: number
+  /** Pedidos entregados adicionales, para probar el tope de la bandeja. */
+  extraOrders?: number
 }
 
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64')
@@ -111,6 +113,12 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
     categoryWrites: [], settingsPatches: [], uploads: [], removed: [], authed: [],
   }
   let nextId = 100
+  for (let n = 0; n < (options.extraOrders ?? 0); n++) {
+    state.orders.push({
+      ...state.orders[1]!, id: `x${n}`, folio: `L-HIST${String(n).padStart(3, '0')}`, status: 'delivered',
+      created_at: `2026-01-01T00:00:${String(n % 60).padStart(2, '0')}Z`,
+    })
+  }
 
   // ---- Auth (GoTrue) ----
   await page.route('**/auth/v1/**', async (route) => {
@@ -220,7 +228,8 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
         if (q('status')) rows = rows.filter((o) => o.status === q('status'))
         const folio = url.searchParams.get('folio')?.replace(/^ilike\./, '').replaceAll('%', '').toLowerCase()
         if (folio) rows = rows.filter((o) => o.folio.toLowerCase().includes(folio))
-        return send(route, rows.map(orderSummary))
+        const limit = Number(url.searchParams.get('limit') ?? Infinity)
+        return send(route, rows.slice(0, limit).map(orderSummary))
       }
 
       case 'confirm_order': {
@@ -333,7 +342,9 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
           state.categories = state.categories.filter((c) => c.id !== q('id'))
           return route.fulfill({ status: 204, headers: cors })
         }
-        return send(route, state.categories)
+        // Como PostgREST: respeta ?active=eq.true (la tienda pública lo envía; RLS al admin le daría todas).
+        const onlyActive = url.searchParams.get('active') === 'eq.true'
+        return send(route, onlyActive ? state.categories.filter((c) => c.active) : state.categories)
       }
 
       case 'product_images': {

@@ -100,6 +100,12 @@ test.describe('inicio y detalle', () => {
     await expect(page.getByText('Gluten, Lácteos, Huevo')).toBeVisible()
   })
 
+  test('alérgenos verificados sin lista: «ninguno declarado», nunca «por verificar»', async ({ page }) => {
+    await page.goto('/#/producto/cupcake-vainilla')
+    await expect(page.getByText('ninguno declarado por la tienda')).toBeVisible()
+    await expect(page.getByText('por verificar por la tienda')).toHaveCount(0)
+  })
+
   test('un producto inexistente muestra mensaje claro', async ({ page }) => {
     await page.goto('/#/producto/no-existe')
     await expect(page.getByRole('heading', { level: 1, name: 'Producto no encontrado' })).toBeVisible()

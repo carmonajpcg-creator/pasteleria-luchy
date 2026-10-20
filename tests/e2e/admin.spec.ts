@@ -378,6 +378,32 @@ test.describe('catálogo, inventario y configuración', () => {
   })
 })
 
+test.describe('revisión Opus', () => {
+  test('H1: con sesión de admin, la tienda pública no muestra categorías inactivas', async ({ page }) => {
+    await setup(page)
+    await loginAndGo(page, '/admin/categorias')
+    await page.getByRole('button', { name: 'Editar Cupcakes' }).click()
+    await page.getByLabel(/Activa \(visible/).uncheck()
+    await page.getByRole('button', { name: 'Guardar', exact: true }).click()
+    await expect(page.getByText(/cupcakes · orden 2 · Inactiva/)).toBeVisible()
+
+    const consultas: string[] = []
+    page.on('request', (r) => r.url().includes('/rest/v1/categories') && consultas.push(r.url()))
+    await page.goto('/#/catalogo')
+    await expect(page.getByRole('button', { name: 'Pasteles' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Cupcakes' })).toHaveCount(0)
+    expect(consultas.every((u) => u.includes('active=eq.true'))).toBe(true)
+  })
+
+  test('H4: con más de 100 pedidos la bandeja avisa que muestra solo los recientes', async ({ page }) => {
+    await setup(page, { extraOrders: 120 })
+    await loginAndGo(page, '/admin/pedidos')
+    await expect(page.getByRole('status').filter({ hasText: 'Mostrando los 100 pedidos más recientes' })).toBeVisible()
+    await page.getByLabel('Buscar por folio').fill('L-HIST119')
+    await expect(page.getByRole('link', { name: 'L-HIST119' })).toBeVisible()
+  })
+})
+
 test.describe('accesibilidad y diseño', () => {
   const pantallas: [string, string][] = [
     ['/admin', 'Panel administrativo'],

@@ -22,6 +22,8 @@ export async function fetchCategories(): Promise<Category[]> {
   const { data, error } = await client()
     .from('categories')
     .select('id, slug, name, sort_order')
+    // Filtro explícito: si un admin navega la tienda con su sesión, RLS también le devolvería las inactivas.
+    .eq('active', true)
     .order('sort_order')
   if (error) throw error
   return data as Category[]

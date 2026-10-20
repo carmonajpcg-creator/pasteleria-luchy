@@ -68,6 +68,8 @@ export function ProductPage() {
               <dd className="inline">
                 {p.allergens_verified && p.allergens.length > 0 ? (
                   p.allergens.join(', ')
+                ) : p.allergens_verified ? (
+                  'ninguno declarado por la tienda'
                 ) : (
                   <span className="text-muted">por verificar por la tienda</span>
                 )}

@@ -1,0 +1,53 @@
+import { makeCheckoutSchema, maxRequestedDate, minRequestedDate } from './schema'
+
+const valid = {
+  name: 'Ana López',
+  phone: '55 1234 5678',
+  email: '',
+  fulfillment: 'pickup' as const,
+  requestedDate: '2026-11-10',
+  notes: '',
+  privacy: true,
+}
+const schema = makeCheckoutSchema('2026-11-01')
+const issue = (over: object) => {
+  const r = schema.safeParse({ ...valid, ...over })
+  return r.success ? null : r.error.issues[0]?.message
+}
+
+describe('esquema de checkout', () => {
+  it('acepta datos válidos', () => {
+    expect(schema.safeParse(valid).success).toBe(true)
+  })
+  it('exige nombre, teléfono y consentimiento', () => {
+    expect(issue({ name: ' ' })).toMatch(/nombre/i)
+    expect(issue({ phone: '123' })).toMatch(/teléfono/i)
+    expect(issue({ phone: '--------' })).toMatch(/8 dígitos/)
+    expect(issue({ privacy: false })).toMatch(/aviso de privacidad/)
+  })
+  it('valida correo opcional', () => {
+    expect(issue({ email: 'sin-arroba' })).toMatch(/correo/i)
+    expect(issue({ email: 'ana@correo.mx' })).toBeNull()
+  })
+  it('rechaza fechas antes de la mínima o muy lejanas', () => {
+    expect(issue({ requestedDate: '2026-10-31' })).toMatch(/a partir del día/)
+    expect(issue({ requestedDate: '2026-11-01' })).toBeNull()
+    expect(issue({ requestedDate: '2027-03-01' })).toMatch(/lejana/)
+    expect(issue({ requestedDate: '' })).toMatch(/fecha/i)
+  })
+  it('limita las notas a 1000 caracteres', () => {
+    expect(issue({ notes: 'x'.repeat(1001) })).toMatch(/1000/)
+  })
+})
+
+describe('fechas de pedido', () => {
+  it('suma días de anticipación redondeando hacia arriba', () => {
+    const now = new Date(2026, 9, 20, 15, 0) // 20/oct/2026 local
+    expect(minRequestedDate(0, now)).toBe('2026-10-20')
+    expect(minRequestedDate(48, now)).toBe('2026-10-22')
+    expect(minRequestedDate(25, now)).toBe('2026-10-22')
+  })
+  it('el máximo es 90 días después del mínimo', () => {
+    expect(maxRequestedDate('2026-11-01')).toBe('2027-01-30')
+  })
+})

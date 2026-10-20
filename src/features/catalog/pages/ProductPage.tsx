@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Loading, LoadError } from '../../../components/QueryState'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { formatMXN } from '../../../lib/money'
+import { AddToCart } from '../../cart/components/AddToCart'
 import { AvailabilityBadge } from '../components/AvailabilityBadge'
 import { ProductImage } from '../components/ProductImage'
 import { formatLeadTime } from '../filter'
@@ -79,10 +80,7 @@ export function ProductPage() {
               Producto bajo pedido: la fecha más próxima de entrega se confirmará con la tienda.
             </p>
           )}
-          <p role="note" className="rounded-xl bg-purple-100 p-3 text-sm">
-            Agregar al carrito estará disponible en la siguiente etapa del proyecto. Por ahora puedes explorar el
-            catálogo.
-          </p>
+          <AddToCart key={p.id} product={p} />
         </div>
       </div>
     </section>

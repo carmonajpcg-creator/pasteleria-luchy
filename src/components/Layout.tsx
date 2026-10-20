@@ -1,9 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { selectCount, useCart } from '../features/cart/store'
 
 const links = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/catalogo', label: 'Catálogo', end: false },
-  { to: '/carrito', label: 'Carrito', end: false },
 ]
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -12,6 +12,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
   }`
 
 export function Layout() {
+  const count = useCart(selectCount)
   return (
     <>
       <a
@@ -31,6 +32,14 @@ export function Layout() {
                 {l.label}
               </NavLink>
             ))}
+            {/* Revisión R10: «Carrito, 2 productos» en vez de un número suelto. */}
+            <NavLink
+              to="/carrito"
+              className={linkClass}
+              aria-label={count > 0 ? `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}` : 'Carrito'}
+            >
+              Carrito{count > 0 && ` (${count})`}
+            </NavLink>
           </nav>
         </div>
       </header>

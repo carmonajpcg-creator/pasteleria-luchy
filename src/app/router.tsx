@@ -1,6 +1,9 @@
 import { createHashRouter, type RouteObject } from 'react-router-dom'
 import { Layout } from '../components/Layout'
 import { PlaceholderPage } from '../components/PlaceholderPage'
+import { CartPage } from '../features/cart/pages/CartPage'
+import { CheckoutPage } from '../features/orders/pages/CheckoutPage'
+import { OrderPage } from '../features/orders/pages/OrderPage'
 import { CatalogPage } from '../features/catalog/pages/CatalogPage'
 import { HomePage } from '../features/catalog/pages/HomePage'
 import { ProductPage } from '../features/catalog/pages/ProductPage'
@@ -17,9 +20,9 @@ export const routes: RouteObject[] = [
       { path: '/', element: <HomePage /> },
       { path: '/catalogo', element: <CatalogPage /> },
       { path: '/producto/:slug', element: <ProductPage /> },
-      { path: '/carrito', element: page('Carrito', 'Fase 6') },
-      { path: '/checkout', element: page('Checkout', 'Fase 6') },
-      { path: '/pedido/:folio', element: page('Seguimiento de pedido', 'Fase 6') },
+      { path: '/carrito', element: <CartPage /> },
+      { path: '/checkout', element: <CheckoutPage /> },
+      { path: '/pedido/:folio', element: <OrderPage /> },
       { path: '/nosotros', element: <AboutPage /> },
       { path: '/contacto', element: <ContactPage /> },
       { path: '/privacidad', element: <PrivacyPage /> },

@@ -4,6 +4,17 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
+**Fase 6 — Carrito y WhatsApp: implementada y probada; PENDIENTE de revisión Opus** (CLAUDE.md §9 y §11: toca dinero, inventario y datos personales). No se da por cerrada hasta esa revisión. Resultados del 2026-10-20:
+
+- Carrito local (Zustand, persiste solo producto/cantidad/personalización), checkout con React Hook Form + Zod, `create_order` idempotente, página `/pedido/:folio?t=<token>` y enlace `wa.me` con el mensaje codificado.
+- Vitest 44/44, lint y typecheck limpios, build correcto. Playwright 97 correctas y 1 omitida (teclado en móvil): cantidades, totales, validaciones, doble clic, reintento con la misma clave, cambio de carrito con otra clave, error de negocio, token inválido, axe y desbordamiento. El cliente nunca envía precios ni totales (verificado en la petición).
+- Verificación real contra `luchy-pruebas`: pedido creado desde la interfaz, total recalculado por la BD ($690.00), `pending_contact`, sin stock descontado, consentimiento registrado, mensaje con folio/productos/personalización/total, 0 aperturas a `wa.me`, 0 errores de consola. El pedido de prueba se borró.
+- **No se envía ningún mensaje**: el botón es un enlace que abre WhatsApp; las pruebas interceptan `wa.me`. Abrirlo no confirma el pedido y la interfaz lo dice antes y después de registrarlo.
+
+Puntos para la revisión Opus: límite antispam solo por teléfono (el límite por IP queda para Edge Function, D7); `expire_pending_orders()` aún sin programar; el token de seguimiento viaja en la URL; nombre/notas/personalización se guardan en `sessionStorage` solo para armar el mensaje; fecha mínima del cliente en hora local frente a `timezone` de la tienda (hoy `UTC`, por definir).
+
+## Fase 5 — Catálogo (completada)
+
 **Fase 5 — Catálogo: completada** (Fases 1–4 completadas). Inicio, catálogo con búsqueda y filtro por categoría (en la URL), detalle de producto, contacto desde la configuración pública y páginas de nosotros/privacidad/condiciones como **borrador** pendiente de revisión. Resultados del 2026-10-20:
 
 - Vitest 20/20, lint y typecheck limpios, build correcto.

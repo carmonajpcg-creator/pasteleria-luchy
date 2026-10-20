@@ -61,4 +61,6 @@ Hallazgos y resolución:
 | R9 | `input type=number` para cantidad en detalle vs. botones −/+ en carrito | Baja | Unificar al selector −/+ al implementar en Fase 5 |
 | R10 | «Carrito (2)» se anuncia como número suelto | Baja | Implementar como «Carrito, 2 productos» (etiqueta accesible) en Fase 5 |
 
+**Estado de R9 y R10 (Fase 6):** R9 resuelto (selector −/+ unificado en detalle y carrito); R10 resuelto (la cabecera anuncia «Carrito, N productos»). R8 sigue pendiente de la Fase 8.
+
 Veredicto: sistema visual **aprobado para pasar a Fase 3**, con R8–R10 registrados como pendientes de implementación.

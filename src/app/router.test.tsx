@@ -7,8 +7,7 @@ const renderAt = (path: string) =>
 
 describe('router', () => {
   it.each([
-    // Las pantallas con datos remotos (catálogo, detalle, contacto) se cubren en tests/e2e.
-    ['/carrito', 'Carrito'],
+    // Las pantallas con datos remotos (catálogo, detalle, carrito, checkout, pedido) se cubren en tests/e2e.
     ['/privacidad', 'Aviso de privacidad'],
     ['/condiciones', 'Condiciones de pedido'],
     ['/nosotros', 'Nosotros'],

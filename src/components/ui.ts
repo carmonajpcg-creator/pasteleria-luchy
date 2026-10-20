@@ -3,6 +3,7 @@ const btn =
   'inline-flex min-h-12 items-center justify-center rounded-full px-6 font-semibold no-underline'
 
 export const btnPrimary = `${btn} bg-purple-600 text-white`
+export const btnWhatsApp = `${btn} bg-green-700 text-white`
 export const btnOutline = `${btn} border-2 border-purple-600 bg-white text-purple-700`
 
 export const chip =

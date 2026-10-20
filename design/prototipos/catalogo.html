@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo — Pastelería Luchy (prototipo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<div class="demo-flag">Prototipo con datos e imágenes de ejemplo — no son precios ni productos comerciales</div>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Pastelería Luchy</a>
+  <nav class="main" aria-label="Principal">
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html" aria-current="page">Catálogo</a>
+    <a href="carrito.html">Carrito (2)</a>
+  </nav>
+</div></header>
+<main id="contenido" class="wrap">
+  <h1>Catálogo</h1>
+  <form role="search" class="field" onsubmit="return false">
+    <label for="q">Buscar productos</label>
+    <input id="q" type="search" placeholder="Ej. chocolate, fresa…">
+  </form>
+  <div class="chips" role="group" aria-label="Filtrar por categoría">
+    <button class="chip active" aria-pressed="true">Todos</button>
+    <button class="chip" aria-pressed="false">Pasteles</button>
+    <button class="chip" aria-pressed="false">Cupcakes</button>
+    <button class="chip" aria-pressed="false">Galletas</button>
+    <button class="chip" aria-pressed="false">Brownies y barras</button>
+    <button class="chip" aria-pressed="false">Postres y cajas</button>
+  </div>
+  <p class="muted" role="status">8 productos</p>
+  <ul class="grid">
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Pastel de vainilla con buttercream</h3><span class="badge warn">Bajo pedido</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Pastel de chocolate fudge</h3><span class="badge warn">Bajo pedido</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Cupcake de vainilla</h3><span class="badge">Disponible</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Cupcake red velvet</h3><span class="badge">Disponible</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Galletas con chispas de chocolate</h3><span class="badge">Disponible</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Brownie con nuez</h3><span class="badge">Disponible</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Chocoflan</h3><span class="badge warn">Bajo pedido</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+    <li><article class="card"><div class="ph" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div><div class="body"><h3>Mini tiramisú</h3><span class="badge">Disponible</span><span class="price">$000.00 MXN</span><a class="btn btn-primary" href="producto.html">Ver detalle</a></div></article></li>
+  </ul>
+</main>
+<footer class="site"><div class="wrap"><p>Horarios y cobertura: por definir. · <a href="#">Privacidad</a> · <a href="#">Condiciones</a></p></div></footer>
+</body>
+</html>

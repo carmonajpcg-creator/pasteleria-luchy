@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrito y checkout — Pastelería Luchy (prototipo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<div class="demo-flag">Prototipo con datos e imágenes de ejemplo — no son precios ni productos comerciales</div>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Pastelería Luchy</a>
+  <nav class="main" aria-label="Principal">
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html">Catálogo</a>
+    <a href="carrito.html" aria-current="page">Carrito (2)</a>
+  </nav>
+</div></header>
+<main id="contenido" class="wrap">
+  <h1>Tu pedido</h1>
+  <div class="two">
+    <section class="panel" aria-labelledby="res">
+      <h2 id="res">Carrito</h2>
+      <div class="line"><div class="ph" aria-hidden="true"></div><div><strong>Pastel de tres leches</strong><br><span class="muted">$000.00 c/u</span></div>
+        <div class="qty"><button aria-label="Quitar una unidad de Pastel de tres leches">−</button><span aria-live="polite">1</span><button aria-label="Agregar una unidad de Pastel de tres leches">+</button></div></div>
+      <div class="line"><div class="ph" aria-hidden="true"></div><div><strong>Cupcake de vainilla</strong><br><span class="muted">$000.00 c/u</span></div>
+        <div class="qty"><button aria-label="Quitar una unidad de Cupcake de vainilla">−</button><span aria-live="polite">6</span><button aria-label="Agregar una unidad de Cupcake de vainilla">+</button></div></div>
+      <div class="total"><span>Total estimado</span><span>$000.00 MXN</span></div>
+      <p class="muted">El total final lo confirma la tienda; los precios se validan al crear el pedido.</p>
+    </section>
+    <section class="panel" aria-labelledby="dat">
+      <h2 id="dat">Tus datos</h2>
+      <form onsubmit="return false" novalidate>
+        <div class="field"><label for="n">Nombre</label><input id="n" autocomplete="name"></div>
+        <div class="field"><label for="t">Teléfono / WhatsApp</label><input id="t" type="tel" autocomplete="tel"><span class="error" role="alert">Ejemplo de mensaje de error: ingresa un teléfono válido.</span></div>
+        <div class="field"><label for="m">Modalidad</label><select id="m"><option>Recolección</option><option>Entrega a domicilio</option></select></div>
+        <div class="field"><label for="f">Fecha solicitada</label><input id="f" type="date"></div>
+        <div class="field"><label for="no">Notas (opcional)</label><textarea id="no" rows="2"></textarea></div>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px"><input type="checkbox" style="width:24px;height:24px;flex:none"> <span>Acepto el <a href="#">aviso de privacidad</a> y las <a href="#">condiciones de pedido</a>.</span></label>
+        <button class="btn btn-whatsapp" style="width:100%">Enviar pedido por WhatsApp</button>
+      </form>
+      <div class="notice" role="note">Al continuar se abrirá WhatsApp con tu pedido. <strong>El pedido no está confirmado</strong> hasta que la tienda te responda y lo confirme.</div>
+    </section>
+  </div>
+</main>
+<footer class="site"><div class="wrap"><p>Horarios y cobertura: por definir. · <a href="#">Privacidad</a> · <a href="#">Condiciones</a></p></div></footer>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pastel de tres leches — Pastelería Luchy (prototipo)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<div class="demo-flag">Prototipo con datos e imágenes de ejemplo — no son precios ni productos comerciales</div>
+<header class="site"><div class="wrap">
+  <a class="logo" href="index.html">Pastelería Luchy</a>
+  <nav class="main" aria-label="Principal">
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html" aria-current="page">Catálogo</a>
+    <a href="carrito.html">Carrito (2)</a>
+  </nav>
+</div></header>
+<main id="contenido" class="wrap">
+  <p><a href="catalogo.html">← Volver al catálogo</a></p>
+  <div class="two" style="grid-template-columns:1fr">
+    <div class="two" style="align-items:start">
+      <div class="card"><div class="ph" style="aspect-ratio:1" role="img" aria-label="Imagen de ejemplo">Imagen de ejemplo</div></div>
+      <div>
+        <h1>Pastel de tres leches</h1>
+        <span class="badge warn">Bajo pedido</span>
+        <p class="price" style="font-size:1.6rem">$000.00 MXN</p>
+        <p class="muted">Precio provisional editable. Preparación: por definir.</p>
+        <p>Descripción del producto (texto de ejemplo).</p>
+        <p><strong>Alérgenos:</strong> <span class="muted">por verificar por la tienda.</span></p>
+        <div class="field">
+          <label for="cant">Cantidad</label>
+          <input id="cant" type="number" min="1" value="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="pers">Personalización (opcional)</label>
+          <textarea id="pers" rows="2" placeholder="Ej. texto en el pastel"></textarea>
+        </div>
+        <a class="btn btn-primary" href="carrito.html">Agregar al carrito</a>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="site"><div class="wrap"><p>Horarios y cobertura: por definir. · <a href="#">Privacidad</a> · <a href="#">Condiciones</a></p></div></footer>
+</body>
+</html>

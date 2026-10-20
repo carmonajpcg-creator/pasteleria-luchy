@@ -1,0 +1,34 @@
+/* Tokens de diseño — Pastelería Luchy (Fase 2). Fuente de verdad visual; en Fase 3 se migran a tailwind.config. */
+:root {
+  /* Marca */
+  --purple-600: #7C3AED;   /* principal */
+  --purple-700: #6D28D9;   /* hover/pressed, texto morado sobre fondos claros */
+  --purple-400: #A78BFA;   /* suave */
+  --purple-100: #EDE9FE;
+  --green-600: #16A34A;    /* solo gráficos/decorativo: 3.30:1 con blanco */
+  --green-700: #15803D;    /* botones y texto verde: 5.02:1 con blanco */
+  --green-300: #86EFAC;    /* suave */
+
+  /* Neutros */
+  --bg: #FFF7FB;
+  --surface: #FFFFFF;
+  --text: #2D1B3D;
+  --text-muted: #6B7280;   /* 4.59:1 sobre --bg: usar solo en 14px+ */
+  --border: #E9DDF3;
+  --danger: #B91C1C;
+
+  /* Tipografía */
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Espaciado y forma */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 20px rgb(124 58 237 / 0.10);
+  --tap: 48px;             /* alto mínimo de controles táctiles */
+  --focus: 0 0 0 3px #fff, 0 0 0 6px var(--purple-700);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

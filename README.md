@@ -10,7 +10,7 @@ Auditoría Opus de la publicación:
 
 | # | Hallazgo | Severidad | Corrección |
 |---|---|---|---|
-| A1 | El README público mostraba el correo personal del propietario como cuenta de administrador | Media | Quitado de los archivos. **Sigue en un commit ya publicado** (`80264c4`): borrarlo del historial exige reescribirlo y un `push --force`, que está bloqueado por diseño y solo se hará con autorización expresa. Mitigación: contraseña aleatoria de 24 caracteres y límites de Supabase Auth |
+| A1 | El README público mostraba el correo personal del propietario como cuenta de administrador | Media | Quitado de los archivos. Sigue en un commit ya publicado (`80264c4`). **Decisión (2026-10-21): no se reescribe el historial**: el riesgo es bajo (contraseña aleatoria de 24 caracteres, límites de Supabase Auth, 0 forks) y reescribir no garantiza su borrado (GitHub puede seguir sirviendo el commit por su enlace directo). Hay una copia `git bundle` fuera del repositorio por si se reconsidera |
 | A2 | Alertas y actualizaciones de seguridad de dependencias desactivadas | Media | Activadas, más `dependabot.yml` semanal (npm y acciones), agrupado |
 | A3 | Acciones de GitHub en v3/v4 (ejecutadas forzadas en Node 24) | Baja | `checkout`/`setup-node`/`upload-artifact` v7, `upload-pages-artifact`/`deploy-pages` v5, permiso `actions: read` |
 | A4 | `main` sin protección | Baja | Sin force-push ni borrado (no exige PR, para no frenar el flujo) |

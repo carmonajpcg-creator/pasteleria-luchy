@@ -25,7 +25,8 @@ ningún script de pruebas las use por accidente.
 
 ## 3. Publicar en GitHub Pages
 
-El sitio se sirve desde `https://<usuario>.github.io/<repositorio>/`. El flujo `.github/workflows/ci.yml`:
+Sitio actual: **https://carmonajpcg-creator.github.io/pasteleria-luchy/**. Se sirve desde
+`https://<usuario>.github.io/<repositorio>/`. El flujo `.github/workflows/ci.yml`:
 
 1. `checks`: lint, typecheck, Vitest, Playwright (con Supabase simulado).
 2. `deploy` (solo en `main` y solo si `checks` pasó): construye con `VITE_BASE=/<repositorio>/` y las

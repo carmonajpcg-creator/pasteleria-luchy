@@ -4,7 +4,13 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 10 — Publicación: EN CURSO; NO publicada todavía** (2026-10-21). Guía completa en [docs/publicacion.md](docs/publicacion.md).
+**Fase 10 — Publicación: PUBLICADA; pendiente de auditoría Opus y de contenido del negocio** (2026-10-21). Guía completa en [docs/publicacion.md](docs/publicacion.md).
+
+- **Sitio:** https://carmonajpcg-creator.github.io/pasteleria-luchy/ (repositorio público `carmonajpcg-creator/pasteleria-luchy`; el nombre es provisional como el de la tienda).
+- **Primer despliegue (CI en GitHub):** checks, deploy y smoke en verde. **Verificación independiente** desde otra máquina: HTTP 200, CSP presente, apunta al proyecto de producción y no contiene nada del de pruebas, y las 42 pruebas de humo de solo lectura pasan contra la URL pública (escritorio y móvil). **Monitoreo diario** probado con una ejecución manual: en verde.
+- **Privacidad del historial:** antes de publicar se reescribieron los correos de autor al correo privado de GitHub (`…@users.noreply.github.com`) para no exponer el correo personal en un repositorio público; el árbol de archivos quedó idéntico. Solo se subió la rama `main` (sin etiquetas ni copias del historial anterior).
+- **Permisos de Claude Code:** `.claude/settings.json` ahora permite únicamente `git push origin main`; `--force`, `--delete`, `--mirror` y `--tags` siguen bloqueados y cualquier otro envío pide confirmación.
+- **Aviso de mantenimiento:** GitHub avisa de que `actions/checkout`, `setup-node`, `upload-artifact` y `deploy-pages` (v4) se ejecutan forzados en Node 24; funciona, pero conviene subirlos de versión cuando salgan las compatibles.
 
 Hecho y verificado:
 
@@ -14,12 +20,11 @@ Hecho y verificado:
 - **Monitoreo diario** (`.github/workflows/monitoreo.yml`) con el mismo humo sobre `SITE_URL`.
 - **Respaldo y recuperación probados** (`npm run backup`, `npm run restaurar`): se borró toda la base de pruebas, se restauró y las 11 huellas (cantidades, totales, stock, firmas de pedidos/productos/configuración) coincidieron exactamente; la restauración se niega a sobrescribir datos y es atómica.
 
-**Pendiente (por eso no está cerrada):**
+**Pendiente:**
 
-1. **Crear el repositorio en GitHub y publicar.** Requiere que se autorice GitHub CLI en el navegador (código de un solo uso). Después: crear el repositorio, fijar las variables `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `SITE_URL`, activar Pages con «GitHub Actions», primer `push` y comprobar que el humo pasa sobre la URL pública.
-2. **Contenido y políticas del negocio** (docs/publicacion.md §5): productos y precios reales, fotos con licencia, textos legales revisados, horarios y cobertura, dominio.
-3. **Auditoría Opus** de la publicación (CLAUDE.md §11).
-4. Las suites con credenciales (`test:db`, `test:concurrency`, `test:live`) no corren en GitHub Actions; la CI usa Playwright con datos simulados.
+1. **Contenido y políticas del negocio** (docs/publicacion.md §5): productos y precios reales, fotos con licencia, textos legales revisados, horarios y cobertura, dominio. Hasta entonces la tienda publicada tiene el **catálogo vacío** y no debe anunciarse.
+2. **Auditoría Opus** de la publicación (CLAUDE.md §11).
+3. Las suites con credenciales (`test:db`, `test:concurrency`, `test:live`) no corren en GitHub Actions; la CI usa Playwright con datos simulados.
 
 ## Fase 9 — Seguridad y calidad (completada, Opus)
 

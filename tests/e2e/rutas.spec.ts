@@ -45,6 +45,16 @@ for (const [ruta, titulo] of rutas) {
   })
 }
 
+test('el pie de cada página pública ofrece el acceso del personal a la consola de pedidos', async ({ page }) => {
+  for (const ruta of ['/#/', '/#/catalogo', '/#/contacto', '/#/privacidad']) {
+    await page.goto(ruta)
+    await expect(page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ })).toBeVisible()
+  }
+  await page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ }).click()
+  await expect(page).toHaveURL(/#\/admin\/login$/)
+  await expect(page.getByRole('heading', { level: 1, name: 'Acceso administrador' })).toBeVisible()
+})
+
 test('navegación principal entre páginas', async ({ page }) => {
   await page.goto('/#/')
   await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Catálogo' }).click()

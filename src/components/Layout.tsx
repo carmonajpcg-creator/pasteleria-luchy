@@ -65,6 +65,13 @@ export function Layout() {
             <NavLink to="/privacidad" className="text-green-300 underline">Privacidad</NavLink> ·{' '}
             <NavLink to="/condiciones" className="text-green-300 underline">Condiciones</NavLink>
           </p>
+          {/* Entrada del personal a la consola de pedidos: con sesión abre el panel, sin sesión pide el acceso.
+              El enlace es solo comodidad; la protección real está en la base de datos. */}
+          <p className="mt-3 text-sm">
+            <NavLink to="/admin" className="inline-flex min-h-12 items-center text-green-300 underline">
+              Acceso del personal (consola de pedidos)
+            </NavLink>
+          </p>
         </div>
       </footer>
     </>

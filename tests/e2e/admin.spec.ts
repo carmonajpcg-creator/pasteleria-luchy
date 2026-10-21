@@ -45,6 +45,24 @@ test.describe('acceso', () => {
     expect(privadas).toEqual([])
   })
 
+  test('desde la tienda: el acceso del personal lleva al login y, tras entrar, al panel de pedidos', async ({ page }) => {
+    await setup(page)
+    await page.goto('/#/')
+    await page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Acceso administrador' })).toBeVisible()
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill(ADMIN.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+    await page.getByRole('navigation', { name: 'Administración' }).getByRole('link', { name: 'Pedidos' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Pedidos' })).toBeVisible()
+
+    // Con la sesión abierta, el mismo enlace de la tienda abre el panel directamente.
+    await page.getByRole('link', { name: 'Ver tienda' }).click()
+    await page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+  })
+
   test('credenciales incorrectas muestran un error y no dan acceso', async ({ page }) => {
     await setup(page)
     await page.goto('/#/admin/login')

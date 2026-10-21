@@ -25,6 +25,8 @@ export interface AdminProduct {
   low_stock_threshold: number
   featured: boolean
   active: boolean
+  allows_customization: boolean
+  customization_hint: string | null
 }
 
 export interface AdminImage {
@@ -38,7 +40,7 @@ export interface AdminImage {
 
 const CATEGORY = 'id, slug, name, sort_order, active'
 const PRODUCT =
-  'id, category_id, sku, slug, name, description, price_cents, allergens, allergens_verified, lead_time_hours, fulfillment_type, stock_quantity, low_stock_threshold, featured, active'
+  'id, category_id, sku, slug, name, description, price_cents, allergens, allergens_verified, lead_time_hours, fulfillment_type, stock_quantity, low_stock_threshold, featured, active, allows_customization, customization_hint'
 
 export const listCategories = () =>
   unwrap<AdminCategory[]>(db().from('categories').select(CATEGORY).order('sort_order').order('name'))

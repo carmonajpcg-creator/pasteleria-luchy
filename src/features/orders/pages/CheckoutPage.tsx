@@ -12,6 +12,8 @@ import { useStoreSettings } from '../../catalog/hooks'
 import { useCart } from '../../cart/store'
 import { useCartLines } from '../../cart/useCartLines'
 import { createOrder, OrderError } from '../api'
+import { useAvailability } from '../availability'
+import { firstAvailableDay } from '../availabilityDays'
 import { makeCheckoutSchema, maxRequestedDate, minRequestedDate, type CheckoutValues } from '../schema'
 import { attemptKey, clearAttempt, saveExtras } from '../session'
 
@@ -26,9 +28,17 @@ export function CheckoutPage() {
   const submitting = useRef(false)
 
   const maxLead = Math.max(0, ...lines.map((l) => l.product.lead_time_hours))
+  const hasMadeToOrder = lines.some((l) => l.product.fulfillment_type === 'made_to_order')
   // Si la configuración no carga se usa UTC (valor por defecto de la tienda); el servidor decide.
-  const minDate = minRequestedDate(maxLead, settings.data?.timezone ?? 'UTC')
-  const schema = useMemo(() => makeCheckoutSchema(minDate), [minDate])
+  const localMin = minRequestedDate(maxLead, settings.data?.timezone ?? 'UTC')
+
+  // Días cerrados, sin cupo o sin anticipación según el servidor. Si no se puede consultar, la
+  // validación definitiva sigue siendo la de create_order.
+  const availability = useAvailability(maxLead, hasMadeToOrder, lines.length > 0)
+  const days = availability.data
+  const firstDay = days ? firstAvailableDay(days) : null
+  const minDate = firstDay ?? localMin
+  const schema = useMemo(() => makeCheckoutSchema(minDate, days ?? []), [minDate, days])
 
   const {
     register,
@@ -208,7 +218,11 @@ export function CheckoutPage() {
                 {...register('requestedDate')}
               />
               <span id="requestedDate-hint" className="text-sm text-muted">
-                A partir del {minDate.split('-').reverse().join('/')}. La tienda confirmará la fecha final.
+                {days && !firstDay
+                  ? 'Por ahora no hay fechas disponibles en los próximos meses. Escríbenos por WhatsApp desde Contacto.'
+                  : `Primera fecha disponible: ${minDate.split('-').reverse().join('/')}.`}{' '}
+                {hasMadeToOrder && maxLead > 0 && 'Tu pedido incluye productos bajo pedido con anticipación mínima. '}
+                La tienda confirmará la fecha final.
               </span>
             </Field>
             <Field id="notes" label="Notas (opcional)" error={errors.notes?.message}>

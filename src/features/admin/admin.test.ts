@@ -1,7 +1,7 @@
 import { categorySchema, parseAllergens, productSchema, toCategoryInput, toProductInput, type ProductValues } from './catalog/schema'
 import { signedDelta } from './inventory/api'
 import { availableActions, balanceCents } from './orders/transitions'
-import { settingsSchema, toSettingsPatch, type SettingsValues } from './settings/schema'
+import { parseClosedDates, settingsSchema, toSettingsPatch, type SettingsValues } from './settings/schema'
 
 describe('transiciones de pedido', () => {
   const kinds = (status: Parameters<typeof availableActions>[0]) =>
@@ -81,7 +81,18 @@ describe('esquema de producto', () => {
     allergensVerified: false,
     featured: false,
     active: true,
+    allowsCustomization: true,
+    customizationHint: ' Texto en el pastel ',
   }
+  it('la pista de personalización solo se guarda si el producto la admite', () => {
+    expect(toProductInput(valid)).toMatchObject({ allows_customization: true, customization_hint: 'Texto en el pastel' })
+    expect(toProductInput({ ...valid, allowsCustomization: false })).toMatchObject({
+      allows_customization: false,
+      customization_hint: null,
+    })
+    expect(toProductInput({ ...valid, customizationHint: '  ' }).customization_hint).toBeNull()
+    expect(productSchema.safeParse({ ...valid, customizationHint: 'x'.repeat(121) }).success).toBe(false)
+  })
   it('convierte pesos a centavos y alérgenos a lista sin duplicados', () => {
     expect(productSchema.safeParse(valid).success).toBe(true)
     const input = toProductInput(valid)
@@ -113,6 +124,10 @@ describe('esquema de configuración', () => {
     coverageText: '',
     timezone: 'America/Matamoros',
     orderExpiryHours: '48',
+    closedWeekdays: [],
+    closedDates: '',
+    dailyCapacity: '',
+    minLeadHours: '0',
     confirmWhatsapp: false,
   }
   const issue = (over: Partial<SettingsValues>) => {
@@ -131,6 +146,46 @@ describe('esquema de configuración', () => {
     expect(issue({ whatsapp: '8787030104x' })).toMatch(/dígitos/)
     expect(issue({ whatsapp: '123' })).toMatch(/dígitos/)
     expect(issue({ whatsapp: '' })).toBeNull() // aún sin definir
+  })
+  it('sin capacidad ni días cerrados por defecto (la política real está por definir)', () => {
+    const patch = toSettingsPatch(valid)
+    expect(patch.daily_capacity).toBeNull()
+    expect(patch.closed_weekdays).toEqual([])
+    expect(patch.closed_dates).toEqual([])
+    expect(patch.min_lead_hours).toBe(0)
+  })
+  it('convierte capacidad, días cerrados y anticipación general', () => {
+    const patch = toSettingsPatch({
+      ...valid,
+      closedWeekdays: [0, 6, 0],
+      closedDates: '2026-12-25, 2026-12-24\n2026-12-25',
+      dailyCapacity: '4',
+      minLeadHours: '24',
+    })
+    expect(patch).toMatchObject({
+      closed_weekdays: [0, 6],
+      closed_dates: ['2026-12-24', '2026-12-25'],
+      daily_capacity: 4,
+      min_lead_hours: 24,
+    })
+  })
+  it('valida capacidad, anticipación, semana completa y fechas cerradas', () => {
+    expect(issue({ dailyCapacity: '0' })).toMatch(/1 a 1000/)
+    expect(issue({ dailyCapacity: '1001' })).toMatch(/1 a 1000/)
+    expect(issue({ dailyCapacity: 'muchos' })).toMatch(/1 a 1000/)
+    expect(issue({ dailyCapacity: '12' })).toBeNull()
+    expect(issue({ minLeadHours: '721' })).toMatch(/0 a 720/)
+    expect(issue({ minLeadHours: '' })).toMatch(/0 a 720/)
+    expect(issue({ closedWeekdays: [0, 1, 2, 3, 4, 5, 6] })).toMatch(/7 días/)
+    expect(issue({ closedDates: '2026-02-30' })).toMatch(/Fecha no válida: 2026-02-30/)
+    expect(issue({ closedDates: '25/12/2026' })).toMatch(/Fecha no válida/)
+    expect(issue({ closedDates: '2026-12-25\n2027-01-01' })).toBeNull()
+  })
+  it('parseClosedDates ordena, quita duplicados y separa las inválidas', () => {
+    expect(parseClosedDates('2026-12-25;2026-01-01 2026-12-25, nada')).toEqual({
+      dates: ['2026-01-01', '2026-12-25'],
+      invalid: ['nada'],
+    })
   })
   it('valida zona horaria, caducidad y correo', () => {
     expect(issue({ timezone: 'No/Existe' })).toMatch(/Zona horaria/)

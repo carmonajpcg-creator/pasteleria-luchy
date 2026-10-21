@@ -4,6 +4,20 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
+**Fase 8 — Repostería especializada: implementada y probada; PENDIENTE de revisión Opus** (modificó `create_order`: dinero, inventario y concurrencia, CLAUDE.md §9). Resultados del 2026-10-20:
+
+- **Personalización por producto**: cada producto declara si la admite y con qué pista (`allows_customization`, `customization_hint`); la tienda solo muestra el campo en esos productos y el servidor rechaza personalización en los demás. Antes aparecía en todos los productos bajo pedido.
+- **Fechas y anticipación**: anticipación por producto (ya existía) más una **anticipación general** configurable; **días de la semana y fechas cerradas** configurables; el checkout consulta `get_availability`, usa la primera fecha disponible como mínimo y explica por qué una fecha no sirve (ya pasó, falta anticipación, cerrado o sin cupo) sugiriendo la siguiente. Si no se puede consultar, decide el servidor.
+- **Capacidad diaria** configurable (pedidos con productos bajo pedido por fecha solicitada). Un bloqueo por fecha dentro de `create_order` impide sobrevender cuando llegan pedidos a la vez. El panel muestra la carga de los próximos 14 días.
+- **Valores por defecto neutros**: sin límite de capacidad, sin días cerrados y anticipación general 0. No se inventó ninguna política (CLAUDE.md §14).
+- **Promociones**: no se incorporaron (CLAUDE.md §5 las deja como mejora posterior).
+- **Pruebas**: pgTAP 108/108, Vitest 113/113, Playwright 185 correctas y 1 omitida (teclado en móvil), lint, typecheck y build limpios; axe WCAG A/AA sin violaciones en el checkout con errores de fecha, el campo de personalización y el panel con capacidad.
+- **Verificación real** contra `luchy-pruebas` (24 comprobaciones): disponibilidad pública por motivo, personalización aceptada/rechazada y guardada, anticipación general, fecha y día de la semana cerrados, y **concurrencia: 3 pedidos simultáneos con capacidad 1 crearon exactamente uno** (los otros 2 recibieron «Ya no hay cupo»); cancelar libera el cupo; un pedido solo de existencia no consume cupo; reintentar con la misma clave devuelve el mismo pedido aunque el día esté lleno; `admin_capacity` solo para administradores. La verificación encontró que `admin_capacity` devolvía `closed: null` en días abiertos y se corrigió con una migración. Configuración restaurada y datos de prueba borrados.
+- **Supuestos que debe decidir el negocio** (hoy son provisionales y configurables): qué cuenta como capacidad (aquí, pedidos y no unidades), si los pedidos pendientes de confirmar deben reservar cupo (aquí sí, hasta que caducan), qué días se cierra y la anticipación real.
+- Puntos para la revisión Opus: bloqueo `pg_advisory_xact_lock` por fecha y su interacción con la idempotencia, conteo de pendientes vencidos en `capacity_used`, que `get_availability` no revele el volumen de pedidos, la carrera entre cancelar o caducar y crear, y los mensajes de error.
+
+## Fase 7 — Administración (completada con revisión Opus)
+
 **Fase 7 — Administración: completada con revisión Opus** (2026-10-20). Hallazgos y corrección:
 
 | # | Hallazgo | Severidad | Corrección |

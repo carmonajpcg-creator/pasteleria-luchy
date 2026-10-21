@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { describedBy, Field, inputClass } from '../../../../components/Field'
 import { Loading, LoadError } from '../../../../components/QueryState'
@@ -24,6 +24,7 @@ function ProductForm({ product }: { product: AdminProduct | null }) {
     handleSubmit,
     setValue,
     getFieldState,
+    control,
     formState: { errors },
   } = useForm<ProductValues>({
     resolver: zodResolver(productSchema),
@@ -41,8 +42,11 @@ function ProductForm({ product }: { product: AdminProduct | null }) {
       allergensVerified: product?.allergens_verified ?? false,
       featured: product?.featured ?? false,
       active: product?.active ?? true,
+      allowsCustomization: product?.allows_customization ?? false,
+      customizationHint: product?.customization_hint ?? '',
     },
   })
+  const allowsCustomization = useWatch({ control, name: 'allowsCustomization' })
 
   const onSubmit = handleSubmit(async (values) => {
     let savedId = null as string | null
@@ -134,6 +138,27 @@ function ProductForm({ product }: { product: AdminProduct | null }) {
             {...register('allergens')}
           />
         </Field>
+        <div className="mb-4 grid gap-3">
+          <label className="flex items-start gap-3">
+            <input type="checkbox" className="mt-1 size-6" {...register('allowsCustomization')} />
+            <span>Admite personalización (el cliente puede escribir qué texto o diseño necesita)</span>
+          </label>
+        </div>
+        {allowsCustomization && (
+          <Field
+            id="customizationHint"
+            label="Pista para el cliente"
+            hint="Aparece como ejemplo en el campo de personalización (ej. Texto en el pastel)."
+            error={errors.customizationHint?.message}
+          >
+            <input
+              id="customizationHint"
+              aria-describedby={describedBy('customizationHint', { hint: true, error: Boolean(errors.customizationHint) })}
+              className={border(Boolean(errors.customizationHint))}
+              {...register('customizationHint')}
+            />
+          </Field>
+        )}
         <div className="mb-4 grid gap-3">
           <label className="flex items-start gap-3">
             <input type="checkbox" className="mt-1 size-6" {...register('allergensVerified')} />

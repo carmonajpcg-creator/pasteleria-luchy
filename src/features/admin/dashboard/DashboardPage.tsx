@@ -5,6 +5,7 @@ import { usePageTitle } from '../../../hooks/usePageTitle'
 import { formatMXN } from '../../../lib/money'
 import { statusLabel, type OrderStatus } from '../../orders/types'
 import { db, unwrap } from '../lib/client'
+import { CapacitySection } from './CapacitySection'
 
 interface Dashboard {
   orders_by_status: Partial<Record<OrderStatus, number>>
@@ -80,6 +81,7 @@ export function DashboardPage() {
               Ir a inventario
             </Link>
           </p>
+          <CapacitySection />
         </>
       )}
     </section>

@@ -59,6 +59,17 @@ select c.id, v.sku, v.slug, v.name, v.description, v.price_cents, v.lead_time_ho
   ) as v(category_slug, sku, slug, name, description, price_cents, lead_time_hours, fulfillment, featured)
   join public.categories c on c.slug = v.category_slug;
 
+-- Personalización de demo (Fase 8): pasteles, galletas decoradas y caja surtida. Es solo un ejemplo
+-- para probar el flujo; qué productos admiten personalización lo decide la tienda desde el panel.
+update public.products
+   set allows_customization = true,
+       customization_hint = case
+         when sku like 'PAS-%' then 'Texto o dedicatoria en el pastel'
+         when sku = 'GAL-002' then 'Texto o diseño de las galletas'
+         else 'Indica qué postres prefieres en la caja'
+       end
+ where sku like 'PAS-%' or sku in ('GAL-002', 'POS-005');
+
 -- Existencias iniciales de demo, registradas como movimientos auditados.
 with s as (
   update public.products set stock_quantity = 12

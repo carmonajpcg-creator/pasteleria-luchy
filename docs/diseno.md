@@ -63,6 +63,8 @@ Hallazgos y resolución:
 
 **Estado de R9 y R10 (Fase 6):** R9 resuelto (selector −/+ unificado en detalle y carrito); R10 resuelto (la cabecera anuncia «Carrito, N productos»). R8 sigue pendiente de la Fase 8.
 
+**Repostería especializada (Fase 8):** el campo de personalización aparece solo en los productos que lo admiten, con pista de ejemplo, contador de caracteres y aviso de que la tienda confirmará. En el checkout, la fecha muestra «Primera fecha disponible», explica el motivo cuando una fecha no sirve (ya pasó, falta anticipación, cerrado o sin cupo) y sugiere la siguiente; los mensajes usan `role="alert"` y texto, no solo color. En el panel, los días de la semana cerrados son casillas agrupadas en un `fieldset` con leyenda. axe WCAG A/AA sin violaciones.
+
 **Panel de administración (Fase 7):** mismas tokens y componentes que la tienda. Navegación propia («Administración») con enlaces de 48 px, formularios con etiqueta, ayuda y error asociados (`aria-describedby`, `role="alert"`, `aria-invalid`), confirmaciones explícitas para acciones irreversibles (cancelar pedido, cambiar WhatsApp) y listas en tarjetas que funcionan sin tablas anchas en móvil. axe WCAG A/AA sin violaciones en las 9 pantallas y sin desbordamiento horizontal a 390 px y 1280 px. No se probó con lector de pantalla.
 
 Veredicto: sistema visual **aprobado para pasar a Fase 3**, con R8–R10 registrados como pendientes de implementación.

@@ -23,7 +23,15 @@ interface Options {
   createOrderError?: { code: string; message: string }
   /** Retraso de create_order para probar dobles clics. */
   createOrderDelayMs?: number
+  /** Fechas (YYYY-MM-DD) cerradas o sin cupo, como las informaría get_availability. */
+  closedDates?: string[]
+  fullDates?: string[]
+  /** Estado HTTP de get_availability (para simular que no se pudo consultar). */
+  availabilityStatus?: number
 }
+
+// Fecha UTC del instante «ahora + horas» (la zona de la tienda en las fixtures es UTC).
+const utcDate = (hoursAhead = 0) => new Date(Date.now() + hoursAhead * 3_600_000).toISOString().slice(0, 10)
 
 interface StoredOrder {
   folio: string
@@ -60,6 +68,21 @@ export async function mockSupabase(page: Page, options: Options = {}) {
         return json(route, [])
       case 'store_settings':
         return json(route, wantsObject ? fixtures.settings : [fixtures.settings])
+
+      case 'get_availability': {
+        if (options.availabilityStatus) return json(route, { message: 'error simulado' }, options.availabilityStatus)
+        const { p_from, p_to, p_lead_hours } = req.postDataJSON() as { p_from: string; p_to: string; p_lead_hours: number }
+        const today = utcDate()
+        const minDay = utcDate(p_lead_hours ?? 0)
+        const out: { day: string; available: boolean; reason: string | null }[] = []
+        for (let d = new Date(`${p_from}T00:00:00Z`); d <= new Date(`${p_to}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + 1)) {
+          const day = d.toISOString().slice(0, 10)
+          const reason = day < today ? 'past' : day < minDay ? 'lead'
+            : options.closedDates?.includes(day) ? 'closed' : options.fullDates?.includes(day) ? 'full' : null
+          out.push({ day, available: reason === null, reason })
+        }
+        return json(route, out)
+      }
 
       case 'create_order': {
         const body = req.postDataJSON() as Record<string, unknown>
@@ -118,6 +141,13 @@ export async function stubWhatsApp(page: Page) {
     return route.fulfill({ status: 200, contentType: 'text/html', body: '<h1>WhatsApp (simulado)</h1>' })
   })
   return { opened }
+}
+
+/** Fecha UTC YYYY-MM-DD a N días de hoy (la zona de la tienda en las fixtures es UTC). */
+export function utcDaysFromNow(days: number) {
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + days)
+  return d.toISOString().slice(0, 10)
 }
 
 /** Fecha local YYYY-MM-DD a N días de hoy, para el campo de fecha solicitada. */

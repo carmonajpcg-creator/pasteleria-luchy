@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 
 import { describedBy, Field, inputClass } from '../../../../components/Field'
 import { Loading, LoadError } from '../../../../components/QueryState'
@@ -11,7 +11,17 @@ import { useExec } from '../../lib/useExec'
 import { settingsSchema, toSettingsPatch, type SettingsValues, type StoreSettingsRow } from '../schema'
 
 const COLUMNS =
-  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours'
+  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours, closed_weekdays, closed_dates, daily_capacity, min_lead_hours'
+
+const WEEKDAYS = [
+  { value: 1, label: 'Lunes' },
+  { value: 2, label: 'Martes' },
+  { value: 3, label: 'Miércoles' },
+  { value: 4, label: 'Jueves' },
+  { value: 5, label: 'Viernes' },
+  { value: 6, label: 'Sábado' },
+  { value: 0, label: 'Domingo' },
+]
 
 const getSettings = () => unwrap<StoreSettingsRow>(db().from('store_settings').select(COLUMNS).single())
 
@@ -41,6 +51,10 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
       coverageText: settings.coverage_text ?? '',
       timezone: settings.timezone,
       orderExpiryHours: String(settings.order_expiry_hours),
+      closedWeekdays: settings.closed_weekdays,
+      closedDates: settings.closed_dates.join('\n'),
+      dailyCapacity: settings.daily_capacity === null ? '' : String(settings.daily_capacity),
+      minLeadHours: String(settings.min_lead_hours),
       confirmWhatsapp: false,
     },
   })
@@ -118,6 +132,89 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
           <input id="orderExpiryHours" inputMode="numeric" aria-invalid={errors.orderExpiryHours ? true : undefined} aria-describedby={describedBy('orderExpiryHours', { error: Boolean(errors.orderExpiryHours) })} className={border(Boolean(errors.orderExpiryHours))} {...register('orderExpiryHours')} />
         </Field>
       </div>
+      <fieldset className="mb-4 rounded-xl border border-line p-4">
+        <legend className="px-1 font-semibold">Pedidos y fechas</legend>
+        <p className="mb-3 text-sm text-muted">
+          Define cuándo recibe pedidos la tienda. Sin límite y sin días cerrados por defecto: la política real la decide
+          el negocio.
+        </p>
+        <Controller
+          control={control}
+          name="closedWeekdays"
+          render={({ field }) => (
+            <fieldset className="mb-4">
+              <legend className="mb-1 font-semibold">Días de la semana sin pedidos</legend>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {WEEKDAYS.map((d) => (
+                  <label key={d.value} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="size-6"
+                      checked={field.value.includes(d.value)}
+                      onChange={(e) =>
+                        field.onChange(e.target.checked ? [...field.value, d.value] : field.value.filter((v) => v !== d.value))
+                      }
+                    />
+                    <span>{d.label}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.closedWeekdays && (
+                <span role="alert" className="text-sm text-danger">
+                  {errors.closedWeekdays.message}
+                </span>
+              )}
+            </fieldset>
+          )}
+        />
+        <Field
+          id="closedDates"
+          label="Fechas cerradas (vacaciones, festivos)"
+          hint="Una por línea o separadas por comas, formato AAAA-MM-DD (ej. 2026-12-25)."
+          error={errors.closedDates?.message}
+        >
+          <textarea
+            id="closedDates"
+            rows={3}
+            aria-invalid={errors.closedDates ? true : undefined}
+            aria-describedby={describedBy('closedDates', { hint: true, error: Boolean(errors.closedDates) })}
+            className={`${border(Boolean(errors.closedDates))} py-2`}
+            {...register('closedDates')}
+          />
+        </Field>
+        <div className="grid gap-x-3 sm:grid-cols-2">
+          <Field
+            id="dailyCapacity"
+            label="Capacidad diaria (pedidos bajo pedido)"
+            hint="Máximo de pedidos con productos bajo pedido por fecha. Vacío = sin límite."
+            error={errors.dailyCapacity?.message}
+          >
+            <input
+              id="dailyCapacity"
+              inputMode="numeric"
+              aria-invalid={errors.dailyCapacity ? true : undefined}
+              aria-describedby={describedBy('dailyCapacity', { hint: true, error: Boolean(errors.dailyCapacity) })}
+              className={border(Boolean(errors.dailyCapacity))}
+              {...register('dailyCapacity')}
+            />
+          </Field>
+          <Field
+            id="minLeadHours"
+            label="Anticipación general (horas)"
+            hint="Mínimo para cualquier pedido, además de la de cada producto."
+            error={errors.minLeadHours?.message}
+          >
+            <input
+              id="minLeadHours"
+              inputMode="numeric"
+              aria-invalid={errors.minLeadHours ? true : undefined}
+              aria-describedby={describedBy('minLeadHours', { hint: true, error: Boolean(errors.minLeadHours) })}
+              className={border(Boolean(errors.minLeadHours))}
+              {...register('minLeadHours')}
+            />
+          </Field>
+        </div>
+      </fieldset>
       {error && (
         <p role="alert" className="mb-3 text-danger">
           {error}

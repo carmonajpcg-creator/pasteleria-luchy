@@ -34,6 +34,8 @@ export const productSchema = z.object({
   allergensVerified: z.boolean(),
   featured: z.boolean(),
   active: z.boolean(),
+  allowsCustomization: z.boolean(),
+  customizationHint: z.string().trim().max(120, 'Máximo 120 caracteres'),
 })
 export type ProductValues = z.infer<typeof productSchema>
 
@@ -55,4 +57,7 @@ export const toProductInput = (v: ProductValues): ProductInput => ({
   allergens_verified: v.allergensVerified,
   featured: v.featured,
   active: v.active,
+  allows_customization: v.allowsCustomization,
+  // La pista solo tiene sentido si el producto admite personalización.
+  customization_hint: v.allowsCustomization ? v.customizationHint.trim() || null : null,
 })

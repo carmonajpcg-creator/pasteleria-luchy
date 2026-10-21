@@ -4,7 +4,8 @@ import type { CatalogProduct } from './types'
 const make = (over: Partial<CatalogProduct>): CatalogProduct => ({
   id: 'x', slug: 'x', sku: 'X', name: 'X', description: '', price_cents: 100, allergens: [],
   allergens_verified: false, lead_time_hours: 0, fulfillment_type: 'stock', featured: false,
-  available: true, category_id: 'c', category_slug: 'pasteles', category_name: 'Pasteles', ...over,
+  available: true, category_id: 'c', category_slug: 'pasteles', category_name: 'Pasteles',
+  allows_customization: false, customization_hint: null, ...over,
 })
 
 const products = [

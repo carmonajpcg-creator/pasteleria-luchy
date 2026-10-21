@@ -19,7 +19,11 @@ export function useCartLines() {
   if (products.data) {
     for (const item of items) {
       const product = products.data.find((p) => p.id === item.productId)
-      if (product) lines.push({ item, product, lineTotalCents: product.price_cents * item.quantity })
+      if (product) {
+        // Si la tienda dejó de admitir personalización en este producto, se ignora la que quedó guardada.
+        const effective = product.allows_customization ? item : { ...item, customization: undefined }
+        lines.push({ item: effective, product, lineTotalCents: product.price_cents * item.quantity })
+      }
       else missing.push(item)
     }
   }

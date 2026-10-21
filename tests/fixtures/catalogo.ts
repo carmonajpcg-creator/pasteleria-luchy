@@ -5,13 +5,17 @@ const categories = [
   { id: 'c3', slug: 'postres-individuales-y-cajas', name: 'Postres individuales y cajas', sort_order: 3 },
 ]
 
-const base = { allergens: [], allergens_verified: false, featured: false, available: true }
+const base = {
+  allergens: [], allergens_verified: false, featured: false, available: true,
+  allows_customization: false, customization_hint: null as string | null,
+}
 
 const products = [
   {
     ...base, id: 'p1', slug: 'pastel-tres-leches', sku: 'PAS-004', name: 'Pastel de tres leches',
     description: 'Bizcocho bañado en tres leches.', price_cents: 60000, lead_time_hours: 48,
     fulfillment_type: 'made_to_order', featured: true, category_id: 'c1', category_slug: 'pasteles', category_name: 'Pasteles',
+    allows_customization: true, customization_hint: 'Texto en el pastel',
   },
   {
     ...base, id: 'p2', slug: 'pastel-chocolate-fudge', sku: 'PAS-002', name: 'Pastel de chocolate fudge',

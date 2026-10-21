@@ -31,7 +31,7 @@ export function AddToCart({ product }: { product: CatalogProduct }) {
         <p className="mb-1 font-semibold">Cantidad</p>
         <QuantitySelector name={product.name} value={quantity} onChange={setQuantity} />
       </div>
-      {product.fulfillment_type === 'made_to_order' && (
+      {product.allows_customization && (
         <div className="flex flex-col gap-1">
           <label htmlFor="customization" className="font-semibold">
             Personalización (opcional)
@@ -42,9 +42,13 @@ export function AddToCart({ product }: { product: CatalogProduct }) {
             maxLength={MAX_CUSTOMIZATION}
             value={customization}
             onChange={(e) => setCustomization(e.target.value)}
-            placeholder="Ej. texto en el pastel"
+            placeholder={product.customization_hint ?? 'Ej. texto o diseño que necesitas'}
+            aria-describedby="customization-help"
             className="min-h-12 rounded-xl border border-line bg-white px-4 py-2"
           />
+          <span id="customization-help" className="text-sm text-muted">
+            {customization.length}/{MAX_CUSTOMIZATION} · La tienda confirmará contigo si puede hacerlo.
+          </span>
         </div>
       )}
       <button type="submit" className={`${btnPrimary} w-full sm:w-auto`}>

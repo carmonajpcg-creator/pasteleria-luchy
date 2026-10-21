@@ -17,6 +17,8 @@ export interface CatalogProduct {
   category_id: string
   category_slug: string
   category_name: string
+  allows_customization: boolean
+  customization_hint: string | null
 }
 
 export interface Category {

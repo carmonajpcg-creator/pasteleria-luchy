@@ -1,5 +1,12 @@
 import { z } from 'zod'
 import { parseIsoDate, toIsoDate } from '../../lib/dates'
+import {
+  nextAvailableAfter,
+  reasonMessage,
+  unavailableMap,
+  type DayAvailability,
+  type UnavailableReason,
+} from './availabilityDays'
 
 export const MAX_DAYS_AHEAD = 90
 
@@ -25,9 +32,20 @@ export function maxRequestedDate(minDate: string): string {
   return toIsoDate(d)
 }
 
-// Mismos límites que las restricciones de la tabla orders (supabase/migrations).
-export const makeCheckoutSchema = (minDate: string) =>
-  z.object({
+const ddmmyyyy = (iso: string) => iso.split('-').reverse().join('/')
+
+function unavailableMessage(day: string, reason: UnavailableReason, days: DayAvailability[]) {
+  const next = nextAvailableAfter(days, day)
+  return `${reasonMessage[reason]}${next ? ` Prueba con el ${ddmmyyyy(next)}.` : ''}`
+}
+
+/**
+ * Mismos límites que las restricciones de la tabla orders (supabase/migrations).
+ * `days`: disponibilidad que informó el servidor (vacío si no se pudo consultar; el servidor decide).
+ */
+export const makeCheckoutSchema = (minDate: string, days: DayAvailability[] = []) => {
+  const unavailable = unavailableMap(days)
+  return z.object({
     name: z.string().trim().min(2, 'Escribe tu nombre').max(100, 'Máximo 100 caracteres'),
     phone: z
       .string()
@@ -43,10 +61,20 @@ export const makeCheckoutSchema = (minDate: string) =>
     requestedDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, 'Elige una fecha')
-      .refine((v) => v >= minDate, 'Elige una fecha a partir del día indicado')
-      .refine((v) => v <= maxRequestedDate(minDate), 'La fecha es demasiado lejana'),
+      .superRefine((v, ctx) => {
+        const problem =
+          v < minDate
+            ? 'Elige una fecha a partir del día indicado'
+            : v > maxRequestedDate(minDate)
+              ? 'La fecha es demasiado lejana'
+              : unavailable[v]
+                ? unavailableMessage(v, unavailable[v], days)
+                : null
+        if (problem) ctx.addIssue({ code: 'custom', message: problem })
+      }),
     notes: z.string().trim().max(1000, 'Máximo 1000 caracteres'),
     privacy: z.boolean().refine((v) => v, 'Debes aceptar el aviso de privacidad y las condiciones para continuar'),
   })
+}
 
 export type CheckoutValues = z.infer<ReturnType<typeof makeCheckoutSchema>>

@@ -43,6 +43,7 @@ function initialState(): AdminState {
     price_cents: p.price_cents, allergens: p.allergens, allergens_verified: p.allergens_verified,
     lead_time_hours: p.lead_time_hours, fulfillment_type: p.fulfillment_type,
     stock_quantity: stock[p.id] ?? 0, low_stock_threshold: 3, featured: p.featured, active: true,
+    allows_customization: p.allows_customization, customization_hint: p.customization_hint,
   }))
   const item = (n: number, product: Json, quantity: number, customization: string | null = null) => ({
     id: `i${n}`, sku: product.sku, name: product.name, unit_price_cents: product.price_cents, quantity,
@@ -72,7 +73,10 @@ function initialState(): AdminState {
     payments: [],
     movements: [],
     images: [],
-    settings: { ...fixtures.settings, order_expiry_hours: 48, timezone: 'America/Matamoros' },
+    settings: {
+      ...fixtures.settings, order_expiry_hours: 48, timezone: 'America/Matamoros',
+      closed_weekdays: [], closed_dates: [], daily_capacity: null, min_lead_hours: 0,
+    },
   }
 }
 
@@ -230,6 +234,19 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
         if (folio) rows = rows.filter((o) => o.folio.toLowerCase().includes(folio))
         const limit = Number(url.searchParams.get('limit') ?? Infinity)
         return send(route, rows.slice(0, limit).map(orderSummary))
+      }
+
+      case 'admin_capacity': {
+        const s = state.settings
+        const days = Array.from({ length: (body!.p_days as number) ?? 14 }, (_, i) => {
+          const d = new Date()
+          d.setUTCDate(d.getUTCDate() + i)
+          const day = d.toISOString().slice(0, 10)
+          const closed = (s.closed_dates as string[]).includes(day) || (s.closed_weekdays as number[]).includes(d.getUTCDay())
+          const orders = state.orders.filter((o) => o.requested_date === day && o.status !== 'cancelled').length
+          return { day, orders, closed }
+        })
+        return send(route, { capacity: s.daily_capacity, days })
       }
 
       case 'confirm_order': {

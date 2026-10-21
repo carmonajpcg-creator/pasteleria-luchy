@@ -5,7 +5,7 @@ const PORT = 4173
 export default defineConfig({
   testDir: './tests',
   // tests/live usa el backend real de pruebas y tiene su propia configuración (playwright.live.config.ts).
-  testIgnore: ['**/live/**'],
+  testIgnore: ['**/live/**', '**/smoke/**'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

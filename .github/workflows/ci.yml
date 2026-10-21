@@ -1,9 +1,13 @@
-name: CI
+name: CI y despliegue
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   checks:
@@ -19,6 +23,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npx playwright install --with-deps chromium
+      # Playwright usa datos de Supabase simulados: nunca toca un proyecto real.
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -26,4 +31,74 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
-# El despliegue a GitHub Pages se añade en la Fase 10, condicionado a que estos checks pasen.
+
+  # Solo se despliega desde main y únicamente si los checks pasaron.
+  deploy:
+    needs: checks
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Comprobar variables públicas de Supabase
+        env:
+          URL: ${{ vars.VITE_SUPABASE_URL }}
+          KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "Faltan las variables VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY del repositorio (son públicas)." >&2
+            exit 1
+          fi
+          case "$KEY" in
+            sb_secret_*|eyJ*) echo "La clave configurada no es la clave publicable (sb_publishable_...)." >&2; exit 1 ;;
+          esac
+      - name: Build de producción
+        env:
+          # Sitio de proyecto en GitHub Pages: https://<usuario>.github.io/<repositorio>/
+          VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Humo de solo lectura sobre la URL recién publicada (no crea pedidos ni escribe datos).
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:smoke
+        env:
+          SMOKE_URL: ${{ needs.deploy.outputs.url }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: smoke-report
+          path: test-results/
+          retention-days: 7

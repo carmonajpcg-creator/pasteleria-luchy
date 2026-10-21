@@ -4,6 +4,25 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
+**Fase 10 — Publicación: EN CURSO; NO publicada todavía** (2026-10-21). Guía completa en [docs/publicacion.md](docs/publicacion.md).
+
+Hecho y verificado:
+
+- **Proyecto de producción** `luchy-produccion` creado, con las 11 migraciones aplicadas desde cero (esquema reproducible), **sin datos ficticios**, zona horaria `America/Matamoros`, WhatsApp configurado, registro público desactivado, contraseñas de 12+ caracteres y un administrador. Verificado con clientes reales: anónimo sin acceso a lo privado, administrador con acceso.
+- **Despliegue** (`.github/workflows/ci.yml`): checks → deploy a GitHub Pages (solo desde `main` y solo si pasaron; se niega a publicar sin las variables públicas o con una clave que no sea la publicable) → humo sobre la URL publicada.
+- **Humo de solo lectura** (`npm run test:smoke`, 42 comprobaciones en escritorio y móvil): enlaces directos y recarga en 13 rutas, recursos bajo la subcarpeta del sitio, CSP, catálogo, enlace de WhatsApp (sin abrirlo), panel protegido. Pasa **42/42** contra el backend de producción servido en la subcarpeta `/pasteleria-luchy/`, como lo hará GitHub Pages.
+- **Monitoreo diario** (`.github/workflows/monitoreo.yml`) con el mismo humo sobre `SITE_URL`.
+- **Respaldo y recuperación probados** (`npm run backup`, `npm run restaurar`): se borró toda la base de pruebas, se restauró y las 11 huellas (cantidades, totales, stock, firmas de pedidos/productos/configuración) coincidieron exactamente; la restauración se niega a sobrescribir datos y es atómica.
+
+**Pendiente (por eso no está cerrada):**
+
+1. **Crear el repositorio en GitHub y publicar.** Requiere que se autorice GitHub CLI en el navegador (código de un solo uso). Después: crear el repositorio, fijar las variables `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` y `SITE_URL`, activar Pages con «GitHub Actions», primer `push` y comprobar que el humo pasa sobre la URL pública.
+2. **Contenido y políticas del negocio** (docs/publicacion.md §5): productos y precios reales, fotos con licencia, textos legales revisados, horarios y cobertura, dominio.
+3. **Auditoría Opus** de la publicación (CLAUDE.md §11).
+4. Las suites con credenciales (`test:db`, `test:concurrency`, `test:live`) no corren en GitHub Actions; la CI usa Playwright con datos simulados.
+
+## Fase 9 — Seguridad y calidad (completada, Opus)
+
 **Fase 9 — Seguridad y calidad: completada (Opus)** (2026-10-20).
 
 | Área | Resultado |

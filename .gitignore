@@ -1,6 +1,8 @@
 node_modules/
 dist/
 dist-live/
+dist-pages/
+backups/
 .env
 .env.*
 !.env.example

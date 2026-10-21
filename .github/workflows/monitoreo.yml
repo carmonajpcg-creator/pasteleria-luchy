@@ -1,0 +1,40 @@
+name: Monitoreo del sitio publicado
+
+# Cada día se repite el humo de solo lectura contra el sitio real. Si falla, GitHub avisa por correo
+# a quien administra el repositorio (Settings > Notifications > Actions).
+on:
+  schedule:
+    - cron: '17 14 * * *' # 14:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  humo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar que hay URL configurada
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "Define la variable SITE_URL del repositorio con la URL publicada (termina en /)." >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:smoke
+        env:
+          SMOKE_URL: ${{ vars.SITE_URL }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: monitoreo-report
+          path: test-results/
+          retention-days: 7

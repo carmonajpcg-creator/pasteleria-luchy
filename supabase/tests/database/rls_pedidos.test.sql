@@ -5,6 +5,13 @@ create extension if not exists pgtap with schema extensions;
 
 select plan(37);
 
+-- Configuración neutra (sin días cerrados ni anticipación general, zona UTC como current_date): estas
+-- pruebas no dependen del día de la semana ni de la hora. Las reglas de fechas y zona horaria se prueban
+-- en reposteria.test.sql y revision_fase8.test.sql.
+update public.store_settings set closed_weekdays = '{}', closed_dates = '{}', pickup_closed_weekdays = '{}',
+  daily_capacity = null, min_lead_hours = 0, timezone = 'UTC';
+set local timezone = 'UTC';
+
 -- Fixtures (como postgres) ----------------------------------------------------------
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin@test.local'),

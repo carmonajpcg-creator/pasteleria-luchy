@@ -26,6 +26,8 @@ interface Options {
   /** Fechas (YYYY-MM-DD) cerradas o sin cupo, como las informaría get_availability. */
   closedDates?: string[]
   fullDates?: string[]
+  /** Fechas sin recolección en tienda (sí con entrega a domicilio). */
+  pickupClosedDates?: string[]
   /** Estado HTTP de get_availability (para simular que no se pudo consultar). */
   availabilityStatus?: number
 }
@@ -71,14 +73,18 @@ export async function mockSupabase(page: Page, options: Options = {}) {
 
       case 'get_availability': {
         if (options.availabilityStatus) return json(route, { message: 'error simulado' }, options.availabilityStatus)
-        const { p_from, p_to, p_lead_hours } = req.postDataJSON() as { p_from: string; p_to: string; p_lead_hours: number }
+        const { p_from, p_to, p_lead_hours, p_fulfillment } = req.postDataJSON() as {
+          p_from: string; p_to: string; p_lead_hours: number; p_fulfillment: string
+        }
         const today = utcDate()
         const minDay = utcDate(p_lead_hours ?? 0)
         const out: { day: string; available: boolean; reason: string | null }[] = []
         for (let d = new Date(`${p_from}T00:00:00Z`); d <= new Date(`${p_to}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + 1)) {
           const day = d.toISOString().slice(0, 10)
           const reason = day < today ? 'past' : day < minDay ? 'lead'
-            : options.closedDates?.includes(day) ? 'closed' : options.fullDates?.includes(day) ? 'full' : null
+            : options.closedDates?.includes(day) ? 'closed'
+            : p_fulfillment === 'pickup' && options.pickupClosedDates?.includes(day) ? 'pickup_closed'
+            : options.fullDates?.includes(day) ? 'full' : null
           out.push({ day, available: reason === null, reason })
         }
         return json(route, out)

@@ -6,7 +6,7 @@ import { db, unwrap } from '../lib/client'
 
 interface Capacity {
   capacity: number | null
-  days: { day: string; orders: number; closed: boolean }[]
+  days: { day: string; orders: number; closed: boolean; pickup_closed: boolean }[]
 }
 
 // Carga de los próximos días: pedidos con productos bajo pedido frente a la capacidad configurada.
@@ -43,7 +43,10 @@ export function CapacitySection() {
               const full = capacity.data.capacity !== null && d.orders >= capacity.data.capacity
               return (
                 <li key={d.day} className="flex justify-between gap-2 rounded-card bg-white px-4 py-2 shadow-card">
-                  <span>{formatDate(d.day)}</span>
+                  <span>
+                    {formatDate(d.day)}
+                    {!d.closed && d.pickup_closed && <span className="block text-sm text-muted">Solo entrega a domicilio</span>}
+                  </span>
                   <span className={full || d.closed ? 'font-semibold text-danger' : 'font-semibold'}>
                     {d.closed
                       ? 'Cerrado'

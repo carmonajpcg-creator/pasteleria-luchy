@@ -125,6 +125,7 @@ describe('esquema de configuración', () => {
     timezone: 'America/Matamoros',
     orderExpiryHours: '48',
     closedWeekdays: [],
+    pickupClosedWeekdays: [0],
     closedDates: '',
     dailyCapacity: '',
     minLeadHours: '0',
@@ -153,6 +154,13 @@ describe('esquema de configuración', () => {
     expect(patch.closed_weekdays).toEqual([])
     expect(patch.closed_dates).toEqual([])
     expect(patch.min_lead_hours).toBe(0)
+  })
+  it('el cierre de recolección es independiente del cierre total (domingo: solo entrega)', () => {
+    const patch = toSettingsPatch({ ...valid, pickupClosedWeekdays: [0, 0] })
+    expect(patch.pickup_closed_weekdays).toEqual([0])
+    expect(patch.closed_weekdays).toEqual([])
+    // A diferencia del cierre total, se pueden marcar los 7 días sin recolección (todo por entrega).
+    expect(issue({ pickupClosedWeekdays: [0, 1, 2, 3, 4, 5, 6] })).toBeNull()
   })
   it('convierte capacidad, días cerrados y anticipación general', () => {
     const patch = toSettingsPatch({

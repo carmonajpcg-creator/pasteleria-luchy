@@ -6,6 +6,9 @@ select plan(26);
 
 insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000a1', 'admin@test.local');
 insert into public.profiles (user_id, role) values ('00000000-0000-0000-0000-0000000000a1', 'admin');
+-- Configuración neutra para que el resultado no dependa del día de la semana (se revierte al final).
+update public.store_settings set closed_weekdays = '{}', closed_dates = '{}', pickup_closed_weekdays = '{}',
+  daily_capacity = null, min_lead_hours = 0;
 
 -- Fechas relativas a la zona de la tienda (el servidor las evalúa igual).
 select set_config('t.today', ((now() at time zone (select timezone from public.store_settings))::date)::text, true);

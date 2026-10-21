@@ -84,10 +84,12 @@ Reglas: dinero en centavos enteros; totales siempre calculados en BD; RLS en tod
 | D15 | `admin_dashboard()` agrega en el servidor ventas confirmadas, pagos netos, conteos por estado y stock bajo | La lógica de dinero no se calcula con filas traídas al navegador. |
 | D16 | Pesos ↔ centavos con análisis de texto (`parsePesos`), nunca con flotantes; la UI solo captura/muestra pesos | CLAUDE.md §7: no confiar en cálculos JS para precios persistidos. |
 | D18 | La personalización la declara cada producto (`allows_customization` + pista), no el tipo de entrega | Un pastel puede no admitirla y unas galletas sí; el servidor rechaza personalización donde no aplica. |
-| D19 | Capacidad diaria = pedidos con productos bajo pedido por fecha solicitada; los pendientes no vencidos reservan cupo | Evita sobrevender mientras la tienda confirma. **Provisional**: la política real (¿pedidos o unidades?, ¿reservan los pendientes?) la define el negocio (CLAUDE.md §14). |
+| D19 | Capacidad diaria = pedidos con productos bajo pedido por fecha solicitada; los pendientes no vencidos reservan cupo | Evita sobrevender mientras la tienda confirma. Aceptado por el propietario (2026-10-20). |
 | D20 | `create_order` toma un `pg_advisory_xact_lock` por fecha cuando hay cupo limitado | Serializa los pedidos de un mismo día sin bloquear otras fechas; verificado con 3 pedidos simultáneos. |
 | D21 | `get_availability` solo informa si un día está disponible y por qué, nunca cuántos pedidos hay; el detalle numérico es solo de `admin_capacity` | No exponer el volumen de ventas al público. |
-| D22 | Valores por defecto neutros: capacidad sin límite, sin días cerrados, anticipación general 0 | No inventar reglas de negocio no definidas. |
+| D22 | Valores por defecto neutros: capacidad sin límite, sin días cerrados, anticipación general 0 | No inventar reglas de negocio no definidas. Sustituido en parte por D23. |
+| D23 | Política de la tienda: domingos sin recolección pero con entrega a domicilio (`pickup_closed_weekdays = {0}`), anticipación general 24 h | Decisión del propietario (2026-10-20); editable en el panel. |
+| D24 | `create_order` revisa la clave de idempotencia otra vez después del bloqueo por fecha | Un envío gemelo que esperó el bloqueo devuelve su pedido en vez de «sin cupo». |
 | D17 | Imágenes de producto con ruta aleatoria (`products/<id>/<uuid>.<ext>`), MIME y 2 MB validados en cliente y en el bucket | No se conserva el nombre original; el servidor es la validación definitiva. |
 
 ## 6. Backlog por fase

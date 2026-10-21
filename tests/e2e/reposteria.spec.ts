@@ -167,7 +167,88 @@ test.describe('fechas, anticipación y capacidad en el checkout', () => {
   })
 })
 
+test.describe('revisión Opus: domingos solo con entrega y doble envío', () => {
+  test('un día sin recolección rechaza «recolección» y acepta «entrega a domicilio»', async ({ page }) => {
+    const domingo = utcDaysFromNow(4)
+    const { createOrderCalls } = await mockSupabase(page, { pickupClosedDates: [domingo] })
+    await agregar(page, 'cupcake-vainilla')
+    await page.goto('/#/checkout')
+    await datosCliente(page)
+    await page.getByLabel('Fecha solicitada').fill(domingo)
+    await page.getByRole('button', { name: 'Registrar pedido' }).click()
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Ese día no hay recolección en tienda; puedes elegir entrega a domicilio.' }),
+    ).toBeVisible()
+    expect(createOrderCalls).toHaveLength(0)
+
+    await page.getByLabel('Modalidad').selectOption('delivery')
+    // La disponibilidad se vuelve a pedir para la nueva modalidad antes de validar.
+    await expect(page.getByText(/Primera fecha disponible/)).toBeVisible()
+    await page.getByRole('button', { name: 'Registrar pedido' }).click()
+    await expect(page).toHaveURL(/#\/pedido\/L-TEST001/)
+    expect(createOrderCalls[0]!.body).toMatchObject({ p_fulfillment: 'delivery', p_requested_date: domingo })
+  })
+})
+
 test.describe('panel: personalización, días cerrados y capacidad', () => {
+  test('configuración: días sin recolección (domingo) independientes del cierre total', async ({ page }) => {
+    await mockSupabase(page)
+    const { calls } = await mockAdmin(page)
+    await page.goto('/#/admin/login')
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill(ADMIN.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+    await page.goto('/#/admin/configuracion')
+    await page.getByRole('checkbox', { name: 'Sin recolección el domingo' }).check()
+    await page.getByRole('button', { name: 'Guardar configuración' }).click()
+    await expect(page.getByText('Cambios guardados.')).toBeVisible()
+    expect(calls.settingsPatches[0]).toMatchObject({ pickup_closed_weekdays: [0], closed_weekdays: [] })
+    const r = await new AxeBuilder({ page }).withTags(wcag).analyze()
+    expect(r.violations).toEqual([])
+  })
+
+  test('H3: confirmar un pendiente caducado en un día lleno avisa y pide confirmación', async ({ page }) => {
+    await mockSupabase(page)
+    const { state, calls } = await mockAdmin(page)
+    state.settings.daily_capacity = 1
+    const dia = utcDaysFromNow(5)
+    Object.assign(state.orders[0]!, { requested_date: dia, expires_at: '2020-01-01T00:00:00Z' }) // caducado
+    Object.assign(state.orders[1]!, { requested_date: dia }) // ocupa el único lugar
+    await page.goto('/#/admin/login')
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill(ADMIN.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+    await page.goto('/#/admin/pedidos/o1')
+
+    await expect(page.getByRole('alert').filter({ hasText: 'Este pedido caducó' })).toContainText('1 de 1')
+    page.once('dialog', (d) => void d.dismiss())
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click()
+    await expect(page.getByText(/Estado:/)).toContainText('Pendiente de confirmar')
+    expect(calls.confirmOrder).toHaveLength(0)
+
+    page.once('dialog', (d) => void d.accept())
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click()
+    await expect(page.getByText(/Estado:/)).toContainText('Confirmado')
+    expect(calls.confirmOrder).toEqual(['o1'])
+  })
+
+  test('un pendiente vigente en un día con cupo no muestra el aviso', async ({ page }) => {
+    await mockSupabase(page)
+    const { state } = await mockAdmin(page)
+    state.settings.daily_capacity = 5
+    state.orders[0]!.expires_at = '2099-01-01T00:00:00Z'
+    await page.goto('/#/admin/login')
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill(ADMIN.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+    await page.goto('/#/admin/pedidos/o1')
+    await expect(page.getByRole('button', { name: 'Confirmar pedido' })).toBeVisible()
+    await expect(page.getByText('Este pedido caducó')).toHaveCount(0)
+  })
+
   async function entrar(page: Page, ruta: string) {
     await mockSupabase(page)
     const mocks = await mockAdmin(page)
@@ -221,8 +302,8 @@ test.describe('panel: personalización, días cerrados y capacidad', () => {
     await page.getByLabel('Fechas cerradas (vacaciones, festivos)').fill('2026-12-25, 2026-12-24')
     await page.getByLabel('Capacidad diaria (pedidos bajo pedido)').fill('4')
     await page.getByLabel('Anticipación general (horas)').fill('24')
-    await page.getByRole('checkbox', { name: 'Domingo' }).check()
-    await page.getByRole('checkbox', { name: 'Lunes' }).check()
+    await page.getByRole('checkbox', { name: 'Domingo', exact: true }).check()
+    await page.getByRole('checkbox', { name: 'Lunes', exact: true }).check()
     await page.getByRole('button', { name: 'Guardar configuración' }).click()
     await expect(page.getByText('Cambios guardados.')).toBeVisible()
     expect(calls.settingsPatches[0]).toMatchObject({
@@ -236,7 +317,7 @@ test.describe('panel: personalización, días cerrados y capacidad', () => {
   test('no se puede cerrar toda la semana', async ({ page }) => {
     const { calls } = await entrar(page, '/admin/configuracion')
     for (const dia of ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']) {
-      await page.getByRole('checkbox', { name: dia }).check()
+      await page.getByRole('checkbox', { name: dia, exact: true }).check()
     }
     await page.getByRole('button', { name: 'Guardar configuración' }).click()
     await expect(page.getByRole('alert').filter({ hasText: 'No puedes cerrar los 7 días de la semana' })).toBeVisible()
@@ -248,6 +329,7 @@ test.describe('panel: personalización, días cerrados y capacidad', () => {
     const { state } = await mockAdmin(page)
     state.settings.daily_capacity = 2
     state.settings.closed_dates = [utcDaysFromNow(2)]
+    state.settings.pickup_closed_weekdays = [0]
     state.orders[0]!.requested_date = utcDaysFromNow(1)
     state.orders[1]!.requested_date = utcDaysFromNow(1)
     await page.goto('/#/admin/login')
@@ -260,6 +342,7 @@ test.describe('panel: personalización, días cerrados y capacidad', () => {
     await expect(seccion.getByRole('listitem')).toHaveCount(14)
     await expect(seccion).toContainText('2 de 2 · lleno')
     await expect(seccion).toContainText('Cerrado')
+    await expect(seccion).toContainText('Solo entrega a domicilio') // 14 días siempre incluyen un domingo
     const r = await new AxeBuilder({ page }).withTags(wcag).analyze()
     expect(r.violations).toEqual([])
   })

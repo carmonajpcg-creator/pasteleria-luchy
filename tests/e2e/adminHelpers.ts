@@ -75,7 +75,7 @@ function initialState(): AdminState {
     images: [],
     settings: {
       ...fixtures.settings, order_expiry_hours: 48, timezone: 'America/Matamoros',
-      closed_weekdays: [], closed_dates: [], daily_capacity: null, min_lead_hours: 0,
+      closed_weekdays: [], pickup_closed_weekdays: [], closed_dates: [], daily_capacity: null, min_lead_hours: 0,
     },
   }
 }
@@ -244,9 +244,20 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
           const day = d.toISOString().slice(0, 10)
           const closed = (s.closed_dates as string[]).includes(day) || (s.closed_weekdays as number[]).includes(d.getUTCDay())
           const orders = state.orders.filter((o) => o.requested_date === day && o.status !== 'cancelled').length
-          return { day, orders, closed }
+          const pickupClosed = (s.pickup_closed_weekdays as number[]).includes(d.getUTCDay())
+          return { day, orders, closed, pickup_closed: pickupClosed }
         })
         return send(route, { capacity: s.daily_capacity, days })
+      }
+
+      case 'admin_day_capacity': {
+        const day = body!.p_day as string
+        // Como capacity_used: los pendientes caducados no ocupan lugar.
+        const orders = state.orders.filter(
+          (o) => o.requested_date === day && o.status !== 'cancelled'
+            && (o.status !== 'pending_contact' || new Date(o.expires_at).getTime() > Date.now()),
+        ).length
+        return send(route, { capacity: state.settings.daily_capacity, orders })
       }
 
       case 'confirm_order': {

@@ -11,7 +11,7 @@ import { useExec } from '../../lib/useExec'
 import { settingsSchema, toSettingsPatch, type SettingsValues, type StoreSettingsRow } from '../schema'
 
 const COLUMNS =
-  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours, closed_weekdays, closed_dates, daily_capacity, min_lead_hours'
+  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours, closed_weekdays, pickup_closed_weekdays, closed_dates, daily_capacity, min_lead_hours'
 
 const WEEKDAYS = [
   { value: 1, label: 'Lunes' },
@@ -52,6 +52,7 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
       timezone: settings.timezone,
       orderExpiryHours: String(settings.order_expiry_hours),
       closedWeekdays: settings.closed_weekdays,
+      pickupClosedWeekdays: settings.pickup_closed_weekdays,
       closedDates: settings.closed_dates.join('\n'),
       dailyCapacity: settings.daily_capacity === null ? '' : String(settings.daily_capacity),
       minLeadHours: String(settings.min_lead_hours),
@@ -138,6 +139,31 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
           Define cuándo recibe pedidos la tienda. Sin límite y sin días cerrados por defecto: la política real la decide
           el negocio.
         </p>
+        <Controller
+          control={control}
+          name="pickupClosedWeekdays"
+          render={({ field }) => (
+            <fieldset className="mb-4">
+              <legend className="mb-1 font-semibold">Días sin recolección en tienda (sí hay entrega a domicilio)</legend>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {WEEKDAYS.map((d) => (
+                  <label key={d.value} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="size-6"
+                      aria-label={`Sin recolección el ${d.label.toLowerCase()}`}
+                      checked={field.value.includes(d.value)}
+                      onChange={(e) =>
+                        field.onChange(e.target.checked ? [...field.value, d.value] : field.value.filter((v) => v !== d.value))
+                      }
+                    />
+                    <span aria-hidden="true">{d.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
+        />
         <Controller
           control={control}
           name="closedWeekdays"

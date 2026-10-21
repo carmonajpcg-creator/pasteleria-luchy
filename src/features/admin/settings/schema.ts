@@ -27,6 +27,7 @@ export const settingsSchema = z.object({
     .regex(/^\d{1,3}$/, 'Escribe horas enteras (1 a 720)')
     .refine((v) => Number(v) >= 1 && Number(v) <= 720, 'Escribe horas enteras (1 a 720)'),
   closedWeekdays: z.array(z.number().int().min(0).max(6)).max(6, 'No puedes cerrar los 7 días de la semana'),
+  pickupClosedWeekdays: z.array(z.number().int().min(0).max(6)),
   closedDates: z.string().max(4000, 'Demasiadas fechas').superRefine((v, ctx) => {
     const { invalid } = parseClosedDates(v)
     if (invalid.length > 0) {
@@ -70,6 +71,7 @@ export interface StoreSettingsRow {
   timezone: string
   order_expiry_hours: number
   closed_weekdays: number[]
+  pickup_closed_weekdays: number[]
   closed_dates: string[]
   daily_capacity: number | null
   min_lead_hours: number
@@ -85,6 +87,7 @@ export const toSettingsPatch = (v: SettingsValues): StoreSettingsRow => ({
   timezone: v.timezone.trim(),
   order_expiry_hours: Number(v.orderExpiryHours),
   closed_weekdays: [...new Set(v.closedWeekdays)].sort(),
+  pickup_closed_weekdays: [...new Set(v.pickupClosedWeekdays)].sort(),
   closed_dates: parseClosedDates(v.closedDates).dates,
   daily_capacity: v.dailyCapacity.trim() === '' ? null : Number(v.dailyCapacity),
   min_lead_hours: Number(v.minLeadHours),

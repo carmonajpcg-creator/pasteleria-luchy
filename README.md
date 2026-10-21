@@ -4,7 +4,33 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 8 — Repostería especializada: implementada y probada; PENDIENTE de revisión Opus** (modificó `create_order`: dinero, inventario y concurrencia, CLAUDE.md §9). Resultados del 2026-10-20:
+**Fase 8 — Repostería especializada: completada con revisión Opus** (2026-10-20).
+
+Decisiones del negocio registradas (el propietario dejó las dos primeras a recomendación):
+
+| Tema | Decisión |
+|---|---|
+| Qué cuenta como capacidad | Pedidos con productos bajo pedido por fecha (no unidades) |
+| ¿Los pendientes reservan cupo? | Sí, hasta que caducan (48 h) |
+| Domingos | **Sin recolección en tienda; sí hay entrega a domicilio** |
+| Anticipación | **24 h general** para todo pedido, además de la de cada producto (pasteles: 48 h) |
+
+Las cuatro son editables desde *Panel → Configuración*; la migración `20260101000900_revision_fase8.sql` deja domingo sin recolección y 24 h como valores iniciales.
+
+Hallazgos de la revisión y corrección:
+
+| # | Hallazgo | Severidad | Corrección |
+|---|---|---|---|
+| H1 | La idempotencia se comprobaba antes del bloqueo por fecha: un doble envío del mismo pedido por el último cupo hacía que el gemelo recibiera «Ya no hay cupo» aunque su pedido existía | Media | Tras tomar el bloqueo se vuelve a buscar la clave. Verificado en real: 3 envíos gemelos simultáneos → mismo folio, sin error, un solo pedido |
+| H2 | Los cierres no distinguían modalidad (no se podía expresar «domingo solo entrega») | Media | `pickup_closed_weekdays`, motivo `pickup_closed` y mensaje que ofrece la entrega a domicilio; el checkout recalcula la disponibilidad al cambiar de modalidad |
+| H3 | Confirmar un pendiente caducado podía rebasar la capacidad del día | Baja | El detalle del pedido avisa con el cupo del día (`admin_day_capacity`) y pide confirmación explícita |
+| H4 | `get_availability` es pública y calcula hasta 121 días por llamada; sin límite por IP | Baja | **Pendiente para la Fase 9** (junto con límite por IP y CSP) |
+
+También se corrigió una prueba antigua que dependía de la hora: usaba la fecha UTC del servidor frente a la zona de la tienda y fallaba solo por las tardes. Las pruebas de base de datos ahora fijan una configuración neutra y las reglas de fechas se prueban aparte.
+
+Tras la revisión: pgTAP 122/122, Vitest 115/115, Playwright 193 correctas y 1 omitida, lint y typecheck limpios, y 10 comprobaciones reales (domingo por modalidad, 24 h, doble envío gemelo por el último cupo). Datos de prueba borrados.
+
+Detalle de la implementación (2026-10-20):
 
 - **Personalización por producto**: cada producto declara si la admite y con qué pista (`allows_customization`, `customization_hint`); la tienda solo muestra el campo en esos productos y el servidor rechaza personalización en los demás. Antes aparecía en todos los productos bajo pedido.
 - **Fechas y anticipación**: anticipación por producto (ya existía) más una **anticipación general** configurable; **días de la semana y fechas cerradas** configurables; el checkout consulta `get_availability`, usa la primera fecha disponible como mínimo y explica por qué una fecha no sirve (ya pasó, falta anticipación, cerrado o sin cupo) sugiriendo la siguiente. Si no se puede consultar, decide el servidor.

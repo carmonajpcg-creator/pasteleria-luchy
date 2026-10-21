@@ -7,6 +7,7 @@ import { usePageTitle } from '../../../../hooks/usePageTitle'
 import { formatDate } from '../../../../lib/dates'
 import { formatMXN } from '../../../../lib/money'
 import { fulfillmentLabel, paymentLabel, statusLabel } from '../../../orders/types'
+import { db, unwrap } from '../../lib/client'
 import { useExec } from '../../lib/useExec'
 import { advanceOrder, cancelOrder, confirmOrder, getOrder, listOrderMovements } from '../api'
 import { PaymentForm } from '../components/PaymentForm'
@@ -23,6 +24,23 @@ export function OrderDetailPage() {
     queryFn: () => listOrderMovements(id as string),
     enabled: Boolean(id),
   })
+  // H3 (revisión Fase 8): un pendiente caducado ya no reserva su lugar; si la fecha se llenó mientras
+  // tanto, confirmarlo rebasa la capacidad. Se avisa y se pide confirmación explícita.
+  // Se compara con la hora en que se cargó el pedido (se recarga tras cada acción).
+  const expiredPending =
+    order.data?.status === 'pending_contact' && new Date(order.data.expires_at).getTime() < order.dataUpdatedAt
+  const dayCapacity = useQuery({
+    queryKey: ['admin', 'day-capacity', order.data?.requested_date],
+    queryFn: () =>
+      unwrap<{ capacity: number | null; orders: number }>(
+        db().rpc('admin_day_capacity', { p_day: order.data?.requested_date }),
+      ),
+    enabled: Boolean(expiredPending),
+  })
+  const overCapacity =
+    expiredPending &&
+    dayCapacity.data?.capacity != null &&
+    dayCapacity.data.orders >= dayCapacity.data.capacity
   const { exec, busy, error } = useExec()
   const [cancelling, setCancelling] = useState(false)
   const [reason, setReason] = useState('')
@@ -70,6 +88,12 @@ export function OrderDetailPage() {
       {actions.length > 0 && (
         <div className="mb-6 rounded-card bg-white p-4 shadow-card">
           <h2 className="mb-2 text-xl font-bold">Acciones</h2>
+          {overCapacity && (
+            <p role="alert" className="mb-3 rounded-xl border border-danger p-3 text-danger">
+              Este pedido caducó y la fecha {formatDate(o.requested_date)} ya tiene {dayCapacity.data?.orders} de{' '}
+              {dayCapacity.data?.capacity} pedidos. Si lo confirmas, ese día quedará por encima de la capacidad.
+            </p>
+          )}
           {o.status === 'pending_contact' && (
             <p className="mb-3 text-sm text-muted">
               Antes de confirmar, coteja la conversación de WhatsApp con el folio <strong>{o.folio}</strong>. Al confirmar
@@ -94,9 +118,16 @@ export function OrderDetailPage() {
                   type="button"
                   disabled={busy}
                   className={`${btnPrimary} disabled:opacity-60`}
-                  onClick={() =>
+                  onClick={() => {
+                    if (
+                      a.kind === 'confirm' &&
+                      overCapacity &&
+                      !window.confirm('La fecha ya está llena. ¿Confirmar de todos modos y rebasar la capacidad?')
+                    ) {
+                      return
+                    }
                     void exec(() => (a.kind === 'confirm' ? confirmOrder(o.id) : advanceOrder(o.id, a.to)))
-                  }
+                  }}
                 >
                   {a.label}
                 </button>

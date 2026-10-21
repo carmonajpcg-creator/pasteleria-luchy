@@ -69,6 +69,12 @@ describe('esquema de checkout con disponibilidad del servidor', () => {
   it('antes de la primera fecha disponible lo dice el mínimo', () => {
     expect(issue('2026-11-02')).toMatch(/a partir del día/)
   })
+  it('un día sin recolección ofrece la entrega a domicilio como alternativa', () => {
+    const conDomingo = makeCheckoutSchema('2026-11-03', [day('2026-11-03'), day('2026-11-08', 'pickup_closed'), day('2026-11-09')])
+    const r = conDomingo.safeParse({ ...valid, requestedDate: '2026-11-08' })
+    expect(r.success ? '' : r.error.issues[0]?.message).toBe(`${reasonMessage.pickup_closed} Prueba con el 09/11/2026.`)
+    expect(reasonMessage.pickup_closed).toMatch(/entrega a domicilio/)
+  })
   it('sin respuesta del servidor solo aplican las reglas locales (el servidor decide)', () => {
     const offline = makeCheckoutSchema('2026-11-03', [])
     expect(offline.safeParse({ ...valid, requestedDate: '2026-11-04' }).success).toBe(true)

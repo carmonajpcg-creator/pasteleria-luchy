@@ -4,6 +4,11 @@ create extension if not exists pgtap with schema extensions;
 
 select plan(7);
 
+-- Configuración neutra: estas pruebas no dependen del día de la semana (se revierte al final).
+update public.store_settings set closed_weekdays = '{}', closed_dates = '{}', pickup_closed_weekdays = '{}',
+  daily_capacity = null, min_lead_hours = 0, timezone = 'UTC';
+set local timezone = 'UTC';
+
 set local role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', true);
 

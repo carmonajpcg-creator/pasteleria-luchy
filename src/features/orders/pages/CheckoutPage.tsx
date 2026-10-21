@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo, useRef } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { Field, inputClass } from '../../../components/Field'
 import { Loading, LoadError } from '../../../components/QueryState'
@@ -32,22 +32,30 @@ export function CheckoutPage() {
   // Si la configuración no carga se usa UTC (valor por defecto de la tienda); el servidor decide.
   const localMin = minRequestedDate(maxLead, settings.data?.timezone ?? 'UTC')
 
-  // Días cerrados, sin cupo o sin anticipación según el servidor. Si no se puede consultar, la
-  // validación definitiva sigue siendo la de create_order.
-  const availability = useAvailability(maxLead, hasMadeToOrder, lines.length > 0)
+  // El esquema depende de la disponibilidad, y la disponibilidad de la modalidad elegida: el resolver
+  // lee el esquema vigente desde una referencia para no recrear el formulario.
+  const schemaRef = useRef(makeCheckoutSchema(localMin))
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+  } = useForm<CheckoutValues>({
+    resolver: (values, context, options) => zodResolver(schemaRef.current)(values, context, options),
+    defaultValues: { name: '', phone: '', email: '', fulfillment: 'pickup', requestedDate: '', notes: '', privacy: false },
+  })
+  const fulfillment = useWatch({ control, name: 'fulfillment' })
+
+  // Días cerrados, sin recolección, sin cupo o sin anticipación según el servidor. Si no se puede
+  // consultar, la validación definitiva sigue siendo la de create_order.
+  const availability = useAvailability(maxLead, hasMadeToOrder, fulfillment, lines.length > 0)
   const days = availability.data
   const firstDay = days ? firstAvailableDay(days) : null
   const minDate = firstDay ?? localMin
   const schema = useMemo(() => makeCheckoutSchema(minDate, days ?? []), [minDate, days])
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<CheckoutValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: '', phone: '', email: '', fulfillment: 'pickup', requestedDate: '', notes: '', privacy: false },
-  })
+  useEffect(() => {
+    schemaRef.current = schema
+  }, [schema])
 
   const mutation = useMutation({
     mutationFn: createOrder,

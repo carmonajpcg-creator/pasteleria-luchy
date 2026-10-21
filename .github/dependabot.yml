@@ -8,6 +8,11 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint solo admite TypeScript < 6.1: subir el compilador antes rompe el lint
+      # (primera ejecución de Dependabot, 2026-10-21). Revisar al actualizar typescript-eslint.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-minor', 'version-update:semver-major']
     groups:
       dependencias:
         patterns: ['*']

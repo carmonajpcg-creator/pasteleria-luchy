@@ -427,18 +427,18 @@ test.describe('accesibilidad y diseño', () => {
     expect(r.violations).toEqual([])
   })
 
-  test('todas las pantallas del panel: axe WCAG A/AA y sin desbordamiento horizontal', async ({ page }) => {
-    await setup(page)
-    await loginAndGo(page, '/admin')
-    for (const [ruta, titulo] of pantallas) {
-      await page.goto(`/#${ruta}`)
+  // Una prueba por pantalla: corren en paralelo y, si alguna falla, el nombre dice cuál.
+  for (const [ruta, titulo] of pantallas) {
+    test(`${ruta}: axe WCAG A/AA y sin desbordamiento horizontal`, async ({ page }) => {
+      await setup(page)
+      await loginAndGo(page, ruta)
       await expect(page.getByRole('heading', { level: 1, name: titulo })).toBeVisible()
       await page.waitForLoadState('networkidle')
       const r = await new AxeBuilder({ page }).withTags(wcag).analyze()
       expect(r.violations, ruta).toEqual([])
       expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), `${ruta} desborda`).toBe(false)
-    }
-  })
+    })
+  }
 
   test('inventario con el panel de ajuste abierto y categorías en edición: axe', async ({ page }) => {
     await setup(page)

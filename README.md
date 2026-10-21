@@ -4,6 +4,30 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
+**Fase 9 — Seguridad y calidad: completada (Opus)** (2026-10-20).
+
+| Área | Resultado |
+|---|---|
+| Auditoría de permisos | Todas las tablas con RLS; toda función privilegiada con `search_path` fijo; `anon` solo ejecuta 5 funciones y lee 3 tablas y 7 columnas públicas; nadie lista ni sube imágenes de forma anónima. Fijado como **regresión de seguridad** (`seguridad.test.sql`, 16 pruebas). |
+| Límite por IP | `create_order` 10/h, `get_availability` y `get_order_public` 60/10 min. IP tomada de `cf-connecting-ip` (Cloudflare rechaza falsificarla) o de la última entrada de `x-forwarded-for` (la primera sí se puede falsificar; **verificado contra el proyecto real**). IP guardada como hash con sal en el esquema `private`; contadores purgados cada hora. Los reintentos del mismo pedido nunca se bloquean. |
+| Concurrencia | Suite permanente `npm run test:concurrency` (16 comprobaciones con conexiones simultáneas reales): doble confirmación, confirmar vs. cancelar, última unidad, confirmación vs. merma, capacidad, envíos gemelos y reembolsos simultáneos. Nunca stock ni saldo negativos, nunca doble descuento. |
+| Navegador | CSP estricta por `<meta>` (sin `unsafe-inline` ni `unsafe-eval`), 0 violaciones en el recorrido de compra y en el panel; el panel no se muestra dentro de un iframe (clickjacking). |
+| Auth | Contraseña mínima de 12 caracteres; registro público ya desactivado (Fase 7). |
+| Dependencias y secretos | `npm audit`: 0 vulnerabilidades. Sin secretos en archivos versionados, en el historial de git ni en el build (solo la clave publicable, que es pública por diseño). |
+| E2E real | Suite permanente `npm run test:live`: build real contra `luchy-pruebas`; cliente pide → admin confirma (stock −2), cobra anticipo y cancela (stock repuesto); 0 errores de consola; limpia lo que crea. |
+
+**Cómo ejecutar las suites contra el proyecto de pruebas** (nunca contra producción):
+
+| Comando | Requiere | Qué hace |
+|---|---|---|
+| `npm run test:db` | `SUPABASE_DB_URL` | pgTAP: RLS, permisos, pedidos, inventario, fechas, límites (todo dentro de transacciones revertidas) |
+| `npm run test:concurrency` | `SUPABASE_DB_URL`, `LUCHY_ENTORNO=pruebas` | Carreras reales con conexiones simultáneas; limpia al terminar |
+| `npm run test:live` | lo anterior + `LUCHY_ADMIN_EMAIL`/`LUCHY_ADMIN_PASSWORD` | Navegador contra el backend real; limpia al terminar |
+
+Pendiente para la Fase 10: estas tres suites necesitan credenciales y no corren en GitHub Actions; la CI ejecuta lint, typecheck, Vitest, build y Playwright con datos simulados.
+
+## Fase 8 — Repostería especializada (completada con revisión Opus)
+
 **Fase 8 — Repostería especializada: completada con revisión Opus** (2026-10-20).
 
 Decisiones del negocio registradas (el propietario dejó las dos primeras a recomendación):

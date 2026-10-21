@@ -48,6 +48,7 @@ const settings = {
   schedule_text: null,
   coverage_text: null,
   timezone: 'UTC',
+  demo_notice: null as string | null,
 }
 
 export const fixtures = { categories, products, settings }

@@ -4,7 +4,23 @@ Tienda web de repostería (español MX, MXN) con catálogo, carrito y pedido por
 
 ## Estado
 
-**Fase 10 — Publicación: PUBLICADA; pendiente de auditoría Opus y de contenido del negocio** (2026-10-21). Guía completa en [docs/publicacion.md](docs/publicacion.md).
+**Fase 10 — Publicación: completada con auditoría Opus** (2026-10-21). Guía completa en [docs/publicacion.md](docs/publicacion.md).
+
+Auditoría Opus de la publicación:
+
+| # | Hallazgo | Severidad | Corrección |
+|---|---|---|---|
+| A1 | El README público mostraba el correo personal del propietario como cuenta de administrador | Media | Quitado de los archivos. **Sigue en un commit ya publicado** (`80264c4`): borrarlo del historial exige reescribirlo y un `push --force`, que está bloqueado por diseño y solo se hará con autorización expresa. Mitigación: contraseña aleatoria de 24 caracteres y límites de Supabase Auth |
+| A2 | Alertas y actualizaciones de seguridad de dependencias desactivadas | Media | Activadas, más `dependabot.yml` semanal (npm y acciones), agrupado |
+| A3 | Acciones de GitHub en v3/v4 (ejecutadas forzadas en Node 24) | Baja | `checkout`/`setup-node`/`upload-artifact` v7, `upload-pages-artifact`/`deploy-pages` v5, permiso `actions: read` |
+| A4 | `main` sin protección | Baja | Sin force-push ni borrado (no exige PR, para no frenar el flujo) |
+| A5 | `site_url` de Auth en `localhost`: un correo de recuperación llevaría a una dirección inexistente | Baja | Apunta al sitio publicado en ambos proyectos |
+| A6 | Wiki y Projects activos sin uso | Baja | Desactivados |
+| A7 | Catálogo de ejemplo + WhatsApp real: un visitante podría enviar pedidos con precios inventados | Media | **Aviso configurable** en todo el sitio y al inicio del mensaje de WhatsApp (`store_settings.demo_notice`) |
+
+Sin hallazgo: HTTPS forzado, permisos de Actions de solo lectura por defecto, escaneo de secretos y protección de push activos, producción con sus tareas programadas, bucket y sal del límite por IP.
+
+**Contenido de ejemplo en producción** (a petición del propietario, para reemplazarlo después): los 20 productos de demostración, horarios y cobertura marcados «de ejemplo», y el aviso «Sitio en preparación: los productos, fotos y precios son de ejemplo.». **Al cargar el catálogo real, borra el aviso** en *Panel → Configuración → Aviso en todo el sitio*.
 
 - **Sitio:** https://carmonajpcg-creator.github.io/pasteleria-luchy/ (repositorio público `carmonajpcg-creator/pasteleria-luchy`; el nombre es provisional como el de la tienda).
 - **Primer despliegue (CI en GitHub):** checks, deploy y smoke en verde. **Verificación independiente** desde otra máquina: HTTP 200, CSP presente, apunta al proyecto de producción y no contiene nada del de pruebas, y las 42 pruebas de humo de solo lectura pasan contra la URL pública (escritorio y móvil). **Monitoreo diario** probado con una ejecución manual: en verde.
@@ -116,7 +132,7 @@ Detalle de la implementación (2026-10-20):
 
 ### Crear un administrador (proyecto de pruebas y producción)
 
-No hay autoasignación de roles. Crear el usuario en *Authentication → Users* de Supabase (o con la API de administración) y, desde el SQL Editor con el rol `postgres`: `insert into public.profiles (user_id, role) values ('<uuid del usuario>', 'admin');`. El registro público está desactivado en `supabase/config.toml` (`enable_signup = false`); para aplicarlo en un proyecto nuevo: `supabase config push`. La cuenta del proyecto de pruebas usa `carmona.jpcg@gmail.com`; su contraseña está solo en variables de usuario de Windows, no en el repositorio.
+No hay autoasignación de roles. Crear el usuario en *Authentication → Users* de Supabase (o con la API de administración) y, desde el SQL Editor con el rol `postgres`: `insert into public.profiles (user_id, role) values ('<uuid del usuario>', 'admin');`. El registro público está desactivado en `supabase/config.toml` (`enable_signup = false`); para aplicarlo en un proyecto nuevo: `supabase config push`. El correo y la contraseña de las cuentas de administrador (pruebas y producción) están solo en variables de usuario de Windows (`LUCHY_ADMIN_*`, `LUCHY_PROD_ADMIN_*`), nunca en el repositorio.
 
 ## Fase 6 — Carrito y WhatsApp (completada con revisión Opus)
 

@@ -55,7 +55,7 @@ select is(
   (select string_agg(column_name::text collate "default", ',' order by column_name::text collate "default")
      from information_schema.role_column_grants
     where grantee = 'anon' and table_schema = 'public' and table_name::text = 'store_settings'),
-  'contact_email,contact_phone,coverage_text,schedule_text,store_name,timezone,whatsapp_number',
+  'contact_email,contact_phone,coverage_text,demo_notice,schedule_text,store_name,timezone,whatsapp_number',
   'anon solo lee las columnas públicas de la configuración');
 select ok(
   not exists (select 1 from information_schema.role_column_grants

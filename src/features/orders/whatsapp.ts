@@ -10,12 +10,15 @@ export interface WhatsAppOrder {
   requestedDate: string // YYYY-MM-DD
   customerName?: string
   notes?: string
+  /** Aviso de la tienda (p. ej. «sitio en preparación»): va al inicio para que la tienda lo vea primero. */
+  storeNotice?: string | null
 }
 
 // Mensaje legible para la tienda. Abrir WhatsApp no envía nada ni confirma el pedido: el folio
 // permite a la tienda cotejar la conversación con el registro (CLAUDE.md §1, pasos 4–6).
 export function buildWhatsAppMessage(order: WhatsAppOrder): string {
   const lines = [
+    ...(order.storeNotice ? [`(Aviso del sitio: ${order.storeNotice})`, ''] : []),
     `Hola, quiero confirmar mi pedido ${order.folio}.`,
     '',
     'Productos:',

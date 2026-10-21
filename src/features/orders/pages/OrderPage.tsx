@@ -11,7 +11,7 @@ import { loadExtras } from '../session'
 import { fulfillmentLabel, paymentLabel, statusLabel, type PublicOrder } from '../types'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from '../whatsapp'
 
-function messageFor(order: PublicOrder) {
+function messageFor(order: PublicOrder, storeNotice: string | null | undefined) {
   // Nombre, notas y personalización solo existen en esta pestaña; en otro dispositivo el mensaje
   // se arma con los datos públicos y el folio basta para que la tienda lo identifique.
   const extras = loadExtras(order.folio)
@@ -28,6 +28,7 @@ function messageFor(order: PublicOrder) {
     requestedDate: order.requested_date,
     customerName: extras?.customerName,
     notes: extras?.notes || undefined,
+    storeNotice,
   })
 }
 
@@ -79,7 +80,7 @@ export function OrderPage() {
   const o = order.data
   const pending = o.status === 'pending_contact'
   const whatsapp = settings.data?.whatsapp_number
-  const message = messageFor(o)
+  const message = messageFor(o, settings.data?.demo_notice)
 
   return (
     <section className="max-w-2xl">

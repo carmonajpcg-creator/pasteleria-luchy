@@ -30,6 +30,8 @@ interface Options {
   pickupClosedDates?: string[]
   /** Estado HTTP de get_availability (para simular que no se pudo consultar). */
   availabilityStatus?: number
+  /** Aviso del sitio configurado por la tienda («sitio en preparación»). */
+  demoNotice?: string
 }
 
 // Fecha UTC del instante «ahora + horas» (la zona de la tienda en las fixtures es UTC).
@@ -69,7 +71,10 @@ export async function mockSupabase(page: Page, options: Options = {}) {
       case 'product_images':
         return json(route, [])
       case 'store_settings':
-        return json(route, wantsObject ? fixtures.settings : [fixtures.settings])
+        {
+          const s = { ...fixtures.settings, demo_notice: options.demoNotice ?? null }
+          return json(route, wantsObject ? s : [s])
+        }
 
       case 'get_availability': {
         if (options.availabilityStatus) return json(route, { message: 'error simulado' }, options.availabilityStatus)

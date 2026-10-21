@@ -11,7 +11,7 @@ import { useExec } from '../../lib/useExec'
 import { settingsSchema, toSettingsPatch, type SettingsValues, type StoreSettingsRow } from '../schema'
 
 const COLUMNS =
-  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours, closed_weekdays, pickup_closed_weekdays, closed_dates, daily_capacity, min_lead_hours'
+  'store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, order_expiry_hours, closed_weekdays, pickup_closed_weekdays, closed_dates, daily_capacity, min_lead_hours, demo_notice'
 
 const WEEKDAYS = [
   { value: 1, label: 'Lunes' },
@@ -56,6 +56,7 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
       closedDates: settings.closed_dates.join('\n'),
       dailyCapacity: settings.daily_capacity === null ? '' : String(settings.daily_capacity),
       minLeadHours: String(settings.min_lead_hours),
+      demoNotice: settings.demo_notice ?? '',
       confirmWhatsapp: false,
     },
   })
@@ -74,6 +75,21 @@ function SettingsForm({ settings }: { settings: StoreSettingsRow }) {
 
   return (
     <form onSubmit={(e) => void onSubmit(e)} noValidate className="max-w-2xl rounded-card bg-white p-4 shadow-card">
+      <Field
+        id="demoNotice"
+        label="Aviso en todo el sitio (opcional)"
+        hint="Se muestra arriba de cada página y al inicio del mensaje de WhatsApp. Úsalo mientras el catálogo tenga datos de ejemplo; déjalo vacío para quitarlo."
+        error={errors.demoNotice?.message}
+      >
+        <input
+          id="demoNotice"
+          maxLength={200}
+          aria-invalid={errors.demoNotice ? true : undefined}
+          aria-describedby={describedBy('demoNotice', { hint: true, error: Boolean(errors.demoNotice) })}
+          className={border(Boolean(errors.demoNotice))}
+          {...register('demoNotice')}
+        />
+      </Field>
       <Field id="storeName" label="Nombre de la tienda" error={errors.storeName?.message}>
         <input id="storeName" aria-invalid={errors.storeName ? true : undefined} aria-describedby={describedBy('storeName', { error: Boolean(errors.storeName) })} className={border(Boolean(errors.storeName))} {...register('storeName')} />
       </Field>

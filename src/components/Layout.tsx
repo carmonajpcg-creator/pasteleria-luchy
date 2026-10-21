@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { selectCount, useCart } from '../features/cart/store'
+import { useStoreSettings } from '../features/catalog/hooks'
 
 const links = [
   { to: '/', label: 'Inicio', end: true },
@@ -13,6 +14,9 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Layout() {
   const count = useCart(selectCount)
+  const settings = useStoreSettings()
+  const notice = settings.data?.demo_notice
+  const schedule = settings.data?.schedule_text
   return (
     <>
       <a
@@ -21,6 +25,12 @@ export function Layout() {
       >
         Saltar al contenido
       </a>
+      {/* Aviso configurable desde el panel (p. ej. «sitio en preparación» con productos de ejemplo). */}
+      {notice && (
+        <p role="note" className="bg-[#fef3c7] px-4 py-2 text-center text-sm font-semibold text-[#78350f]">
+          {notice}
+        </p>
+      )}
       <header className="sticky top-0 z-5 border-b border-line bg-white">
         <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-1">
           <NavLink to="/" className="whitespace-nowrap font-heading text-xl font-bold text-purple-700 no-underline">
@@ -49,7 +59,7 @@ export function Layout() {
       <footer className="mt-12 bg-ink py-8 text-white">
         <div className="mx-auto max-w-6xl px-4">
           <p>
-            Horarios y cobertura: por definir. ·{' '}
+            {schedule ? `Horarios: ${schedule}` : 'Horarios y cobertura: por definir.'} ·{' '}
             <NavLink to="/nosotros" className="text-green-300 underline">Nosotros</NavLink> ·{' '}
             <NavLink to="/contacto" className="text-green-300 underline">Contacto</NavLink> ·{' '}
             <NavLink to="/privacidad" className="text-green-300 underline">Privacidad</NavLink> ·{' '}

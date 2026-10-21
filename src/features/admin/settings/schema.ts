@@ -42,6 +42,7 @@ export const settingsSchema = z.object({
     .string()
     .trim()
     .refine((v) => /^\d{1,3}$/.test(v) && Number(v) <= 720, 'Escribe horas enteras (0 a 720)'),
+  demoNotice: optionalText(200),
   confirmWhatsapp: z.boolean(),
 })
 export type SettingsValues = z.infer<typeof settingsSchema>
@@ -75,6 +76,7 @@ export interface StoreSettingsRow {
   closed_dates: string[]
   daily_capacity: number | null
   min_lead_hours: number
+  demo_notice: string | null
 }
 
 export const toSettingsPatch = (v: SettingsValues): StoreSettingsRow => ({
@@ -91,4 +93,5 @@ export const toSettingsPatch = (v: SettingsValues): StoreSettingsRow => ({
   closed_dates: parseClosedDates(v.closedDates).dates,
   daily_capacity: v.dailyCapacity.trim() === '' ? null : Number(v.dailyCapacity),
   min_lead_hours: Number(v.minLeadHours),
+  demo_notice: v.demoNotice.trim() || null,
 })

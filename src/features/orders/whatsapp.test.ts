@@ -35,6 +35,12 @@ describe('buildWhatsAppMessage', () => {
     expect(text).not.toMatch(/tel[eé]fono|correo|@/i)
   })
 
+  it('el aviso de la tienda va primero para que se distingan los pedidos de prueba', () => {
+    const conAviso = buildWhatsAppMessage({ ...order, storeNotice: 'Sitio en preparación: productos de ejemplo' })
+    expect(conAviso.split('\n')[0]).toBe('(Aviso del sitio: Sitio en preparación: productos de ejemplo)')
+    expect(text).not.toContain('Aviso del sitio') // sin aviso configurado no se añade nada
+  })
+
   it('omite nombre y notas cuando no existen (pedido abierto en otro dispositivo)', () => {
     const minimal = buildWhatsAppMessage({ ...order, customerName: undefined, notes: undefined })
     expect(minimal).not.toContain('Nombre:')

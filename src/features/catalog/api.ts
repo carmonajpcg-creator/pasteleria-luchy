@@ -45,7 +45,7 @@ export function productImageUrl(storagePath: string): string {
 export async function fetchStoreSettings(): Promise<PublicStoreSettings> {
   const { data, error } = await client()
     .from('store_settings')
-    .select('store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone')
+    .select('store_name, whatsapp_number, contact_email, contact_phone, schedule_text, coverage_text, timezone, demo_notice')
     .single()
   if (error) throw error
   return data as PublicStoreSettings

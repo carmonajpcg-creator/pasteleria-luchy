@@ -60,7 +60,14 @@ cámbiala al primer acceso y bórrala de esa variable.
 
 ## 5. Lanzamiento: lo que debe definir el negocio
 
-Con el catálogo de producción **vacío**, antes de abrir al público hay que capturar desde el panel:
+Producción tiene hoy un **catálogo de ejemplo** (los 20 productos de demostración, con precios provisionales)
+y el aviso «Sitio en preparación» visible en todo el sitio y al inicio de cada mensaje de WhatsApp, para que
+nadie confunda esos precios con reales. Para abrir al público:
+
+1. Reemplazar o desactivar los productos de ejemplo (los productos no se borran: se desactivan).
+2. **Borrar el aviso** en *Panel → Configuración → Aviso en todo el sitio* (vacío = sin aviso).
+
+Antes de quitar el aviso hay que capturar desde el panel:
 
 - [ ] Productos reales: nombre, descripción, **precio real**, fotos propias o con licencia (marcar «imagen de ejemplo» solo si no lo son), alérgenos verificados, anticipación y tipo (existencia o bajo pedido).
 - [ ] Categorías reales.

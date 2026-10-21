@@ -129,8 +129,14 @@ describe('esquema de configuración', () => {
     closedDates: '',
     dailyCapacity: '',
     minLeadHours: '0',
+    demoNotice: '',
     confirmWhatsapp: false,
   }
+  it('el aviso del sitio es opcional, se recorta y tiene tope de 200 caracteres', () => {
+    expect(toSettingsPatch(valid).demo_notice).toBeNull()
+    expect(toSettingsPatch({ ...valid, demoNotice: '  Sitio en preparación  ' }).demo_notice).toBe('Sitio en preparación')
+    expect(issue({ demoNotice: 'x'.repeat(201) })).toMatch(/200/)
+  })
   const issue = (over: Partial<SettingsValues>) => {
     const r = settingsSchema.safeParse({ ...valid, ...over })
     return r.success ? null : r.error.issues[0]?.message

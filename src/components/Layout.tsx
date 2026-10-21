@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { selectCount, useCart } from '../features/cart/store'
 import { useStoreSettings } from '../features/catalog/hooks'
+import { useHasSession } from '../hooks/useHasSession'
 
 const links = [
   { to: '/', label: 'Inicio', end: true },
@@ -14,6 +15,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function Layout() {
   const count = useCart(selectCount)
+  const hasSession = useHasSession()
   const settings = useStoreSettings()
   const notice = settings.data?.demo_notice
   const schedule = settings.data?.schedule_text
@@ -36,7 +38,7 @@ export function Layout() {
           <NavLink to="/" className="whitespace-nowrap font-heading text-xl font-bold text-purple-700 no-underline">
             Pastelería Luchy
           </NavLink>
-          <nav aria-label="Principal" className="flex gap-0.5">
+          <nav aria-label="Principal" className="flex flex-wrap gap-0.5">
             {links.map((l) => (
               <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
                 {l.label}
@@ -50,6 +52,16 @@ export function Layout() {
             >
               Carrito{count > 0 && ` (${count})`}
             </NavLink>
+            {/* Acceso del personal: con sesión abierta, atajo a la consola de pedidos; sin ella, inicio de sesión. */}
+            {hasSession ? (
+              <NavLink to="/admin/pedidos" className={linkClass}>
+                Consola de pedidos
+              </NavLink>
+            ) : (
+              <NavLink to="/admin/login" className={linkClass}>
+                Iniciar sesión
+              </NavLink>
+            )}
           </nav>
         </div>
       </header>

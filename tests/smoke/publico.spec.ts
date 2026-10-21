@@ -102,9 +102,9 @@ test('el panel pide sesión y no hace peticiones privadas sin ella', async ({ pa
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
 })
 
-test('el sitio ofrece el acceso del personal y este lleva al inicio de sesión', async ({ page }) => {
+test('el sitio ofrece «Iniciar sesión» en el encabezado y este lleva al inicio de sesión', async ({ page }) => {
   await page.goto('')
-  await page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ }).click()
+  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Iniciar sesión' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Acceso administrador' })).toBeVisible()
   await expect(page.getByLabel('Contraseña')).toBeVisible()
 })

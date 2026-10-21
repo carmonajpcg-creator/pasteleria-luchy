@@ -45,6 +45,14 @@ for (const [ruta, titulo] of rutas) {
   })
 }
 
+test('el encabezado de cada página pública ofrece «Iniciar sesión» y no desborda en móvil', async ({ page }) => {
+  for (const ruta of ['/#/', '/#/catalogo', '/#/contacto']) {
+    await page.goto(ruta)
+    await expect(page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Iniciar sesión' })).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), ruta).toBe(false)
+  }
+})
+
 test('el pie de cada página pública ofrece el acceso del personal a la consola de pedidos', async ({ page }) => {
   for (const ruta of ['/#/', '/#/catalogo', '/#/contacto', '/#/privacidad']) {
     await page.goto(ruta)

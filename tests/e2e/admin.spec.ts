@@ -63,6 +63,51 @@ test.describe('acceso', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
   })
 
+  test('el encabezado de la tienda cambia: «Iniciar sesión» sin sesión y «Consola de pedidos» con ella', async ({ page }) => {
+    await setup(page)
+    const nav = page.getByRole('navigation', { name: 'Principal' })
+
+    // Sin sesión: se ofrece iniciar sesión y no la consola.
+    await page.goto('/#/catalogo')
+    await expect(nav.getByRole('link', { name: 'Iniciar sesión' })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Consola de pedidos' })).toHaveCount(0)
+    await nav.getByRole('link', { name: 'Iniciar sesión' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Acceso administrador' })).toBeVisible()
+
+    // Tras entrar, en la tienda el mismo lugar muestra la consola, que abre la lista de pedidos.
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill(ADMIN.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Panel administrativo' })).toBeVisible()
+    await page.getByRole('link', { name: 'Ver tienda' }).click()
+    await expect(nav.getByRole('link', { name: 'Consola de pedidos' })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Iniciar sesión' })).toHaveCount(0)
+    await page.goto('/#/catalogo') // también tras recargar la página (la sesión se conserva)
+    await page.reload()
+    await expect(nav.getByRole('link', { name: 'Consola de pedidos' })).toBeVisible()
+    await nav.getByRole('link', { name: 'Consola de pedidos' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Pedidos' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'L-ADMIN01' })).toBeVisible()
+
+    // Al cerrar sesión vuelve «Iniciar sesión».
+    await page.getByRole('button', { name: 'Cerrar sesión' }).click()
+    await page.getByRole('link', { name: 'Ver tienda' }).or(page.getByRole('link', { name: 'Volver a la tienda' })).click()
+    await expect(nav.getByRole('link', { name: 'Iniciar sesión' })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Consola de pedidos' })).toHaveCount(0)
+  })
+
+  test('un usuario sin rol que abre la «Consola de pedidos» ve «Sin permisos» (el enlace no da acceso)', async ({ page }) => {
+    await setup(page)
+    await page.goto('/#/admin/login')
+    await page.getByLabel('Correo').fill(NO_ROLE.email)
+    await page.getByLabel('Contraseña').fill(NO_ROLE.password)
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Sin permisos' })).toBeVisible()
+    await page.goto('/#/')
+    await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Consola de pedidos' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Sin permisos' })).toBeVisible()
+  })
+
   test('credenciales incorrectas muestran un error y no dan acceso', async ({ page }) => {
     await setup(page)
     await page.goto('/#/admin/login')

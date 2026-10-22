@@ -249,6 +249,15 @@ En este repositorio trabajan **dos personas**. **SIEMPRE se debe verificar si ha
 - Los comandos de desarrollo del proyecto se ejecutan sin preguntar si se pueden correr. No se piden confirmaciones por comandos rutinarios.
 - Esta regla no cambia las demás: no afirmar pruebas no ejecutadas, no usar credenciales fuera de variables de usuario, no apuntar operaciones destructivas a producción y confirmar antes de acciones irreversibles que afecten sistemas externos.
 
+### Regla estricta: no volver a pedir confirmación de comandos
+
+**NO VOLVER A PEDIR CONFIRMACIÓN DE COMANDOS. HACERLO TODO SIN PREGUNTAR** (instrucción del propietario, 2026-10-22).
+
+- Ningún comando de desarrollo, prueba, compilación, git no destructivo, GitHub CLI, Supabase (pruebas y producción de solo lectura o con migraciones ya revisadas), instalación de dependencias o lectura de archivos requiere preguntar al usuario "¿puedo ejecutarlo?". Se ejecuta y se informa el **resultado**.
+- Si hay varias formas razonables de hacer algo, se elige la recomendada y se continúa; no se devuelven al usuario decisiones técnicas rutinarias. Solo se pregunta cuando falta un dato que únicamente el usuario tiene (credenciales, contenido real del negocio, decisiones comerciales) o ante una acción irreversible de la lista siguiente.
+- Excepciones, que se mantienen aunque esta regla diga lo contrario: `push --force`, reescribir historial publicado, `reset --hard`, borrar datos o proyectos de **producción**, borrar repositorios, exponer secretos y cualquier acción que el sistema de permisos bloquee. En esos casos se explica en una línea qué se necesita y se espera la autorización explícita del usuario.
+- Si el sistema de permisos de Claude Code rechaza un comando, no se esquiva por otra vía: se hace lo demás y se informa. Los permisos permanentes de rutina viven en `.claude/settings.json` (lista `allow`) y se amplían ahí, no saltándolos.
+
 No inventar productos comerciales aprobados, precios, domicilios, teléfonos, políticas de envío ni promesas de entrega. Los datos de demostración son ficticios. Mantener instrucciones, comentarios significativos y documentación en español, salvo nombres técnicos propios del stack.
 
 ## 14. Pendientes por definir antes de lanzamiento

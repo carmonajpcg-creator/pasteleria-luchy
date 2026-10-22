@@ -179,6 +179,19 @@ Skills locales previstas en `.claude/skills/`:
 
 Estas skills se crearán como archivos independientes `SKILL.md` y se validarán; este documento no sustituye sus implementaciones.
 
+### Skills de diseño de terceros instaladas (2026-10-21)
+
+Revisadas antes de instalar (licencia, contenido y scripts, sin ejecutar nada del origen) y copiadas a `.claude/skills/`:
+
+| Skill | Origen (licencia) | Notas de uso en este proyecto |
+|---|---|---|
+| `design-taste-frontend` | Leonxlnx/taste-skill (MIT) | Scripts Node 22+ con Chrome/Edge headless; escriben en `.taste-skill/` (ignorado por git). `assets.mjs` descarga imágenes por red: **verificar licencia de cada foto** (§3) y que cuadre con la CSP antes de usarlas. Respetar la paleta y tipografías de §3 y los tokens existentes. |
+| `ui-ux-pro-max` | nextlevelbuilder/ui-ux-pro-max-skill (MIT) | Búsqueda en datos locales con Python 3 (solo biblioteca estándar; **Python no está instalado en esta máquina**, instalarlo para usar `scripts/search.py`). Ruta de scripts ajustada a `.claude/skills/ui-ux-pro-max/`. Con `--persist` escribe archivos: usar solo si se pide. |
+| `web-design-guidelines` | vercel-labs/web-interface-guidelines (MIT) | Reglas **fijadas localmente** en `guidelines.md` (commit y SHA-256 en su SKILL.md); no se descargan en cada uso. |
+| `awesome-design-md` | VoltAgent/awesome-design-md (MIT) | Solo referencia de estilo; no copiar identidades de marca. |
+
+Estas skills son sugerencias de diseño: no anulan CLAUDE.md, la accesibilidad ni la CSP.
+
 ## 11. Roadmap obligatorio (10 fases)
 
 Cada fase requiere entregables, criterios de aceptación, pruebas aplicables, revisión de errores y commit de Git. La duración es orientativa.

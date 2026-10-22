@@ -234,6 +234,10 @@ Copia `.env.example` a `.env` para configurar Supabase (solo claves públicas).
 - [docs/diseno.md](docs/diseno.md): sistema visual, contraste, componentes y revisión Opus.
 - `design/prototipos/`: maquetas estáticas (abrir `index.html`).
 
+## Skills de diseño
+
+En `.claude/skills/` hay cuatro skills de terceros revisadas e instaladas (`design-taste-frontend`, `ui-ux-pro-max`, `web-design-guidelines`, `awesome-design-md`) además de las propias. Detalle, licencias y precauciones en CLAUDE.md §10.
+
 ## Pendientes antes de lanzamiento
 
 Ver CLAUDE.md §14 (número de WhatsApp, cobertura, horarios, precios, políticas, dominio).

@@ -223,6 +223,7 @@ Cada fase requiere entregables, criterios de aceptación, pruebas aplicables, re
 ## 13. Instrucciones operativas para Claude Code
 
 Al recibir una tarea:
+0. **Sincronizar con el remoto (regla estricta, trabajo en equipo de 2 personas):** antes de cualquier otra cosa, verificar si hay cambios por obtener desde git (`fetch` y comparar la rama con su remota). Ver «Regla estricta: sincronizar con git».
 1. Leer este `CLAUDE.md`, identificar fase activa y revisar estructura existente.
 2. Resumir objetivo, archivos afectados, riesgos, supuestos y pruebas necesarias.
 3. Si falta una decisión crítica (p. ej., número de WhatsApp, horarios, áreas de entrega, política de anticipos), señalarla y usar configuración/placeholder seguro en vez de inventarla.
@@ -230,6 +231,15 @@ Al recibir una tarea:
 5. Añadir/ajustar pruebas automatizadas para la funcionalidad.
 6. Ejecutar comandos de lint, typecheck, test y build disponibles. Nunca afirmar ejecución de pruebas no realizadas.
 7. Informar archivos cambiados, resultados, limitaciones, y siguiente paso. Solicitar revisión Opus ante cambios sensibles.
+
+### Regla estricta: sincronizar con git
+
+En este repositorio trabajan **dos personas**. **SIEMPRE se debe verificar si hay cambios que obtener desde git** (instrucción del propietario, 2026-10-21).
+
+- Al iniciar cada sesión y antes de empezar cualquier tarea, hacer `fetch` y comprobar si la rama actual va por detrás de su remota. Repetir la verificación antes de hacer commit y antes de hacer push.
+- Si hay cambios remotos y el árbol de trabajo está limpio, integrarlos (`pull`, preferentemente fast-forward o rebase) antes de continuar, y revisar qué cambió por si afecta la tarea.
+- Si hay cambios locales sin commit que pueden chocar con los remotos, o la integración produce conflictos, **no sobrescribir ni descartar trabajo de nadie**: detenerse, informar al usuario y resolver con su aprobación. Prohibido `push --force`, `reset --hard` o reescribir historial sin autorización explícita.
+- Informar al usuario del resultado de la verificación (al día, cambios integrados o conflicto), sin listar los comandos, conforme a la regla siguiente.
 
 ### Regla estricta: no reportar comandos
 

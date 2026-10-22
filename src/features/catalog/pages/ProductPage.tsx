@@ -41,12 +41,12 @@ export function ProductPage() {
   return (
     <section>
       {back}
-      <div className="grid items-start gap-6 md:grid-cols-2">
+      <div className="product-page-grid">
         <div className="overflow-hidden rounded-card bg-white shadow-card">
           <ProductImage name={p.name} image={gallery[0]} className="aspect-square" />
         </div>
-        <div className="flex flex-col items-start gap-3">
-          <h1 className="text-3xl font-bold">{p.name}</h1>
+        <div className="product-page-copy">
+          <h1>{p.name}</h1>
           <AvailabilityBadge product={p} />
           <p className="text-2xl font-semibold">{formatMXN(p.price_cents)}</p>
           <p className="text-muted">Precio provisional, sujeto a confirmación de la tienda.</p>

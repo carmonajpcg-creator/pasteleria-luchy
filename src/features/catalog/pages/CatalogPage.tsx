@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Loading, LoadError } from '../../../components/QueryState'
 import { chip, chipActive } from '../../../components/ui'
 import { usePageTitle } from '../../../hooks/usePageTitle'
+import { Icon } from '../../../components/Icon'
 import { ProductCard, ProductGrid } from '../components/ProductCard'
 import { filterProducts } from '../filter'
 import { useCategories, useProductImages, useProducts } from '../hooks'
@@ -31,23 +32,26 @@ export function CatalogPage() {
 
   return (
     <section>
-      <h1 className="mb-4 text-3xl font-bold">Catálogo</h1>
-
-      <form role="search" onSubmit={(e) => e.preventDefault()} className="mb-4 flex flex-col gap-1">
-        <label htmlFor="busqueda" className="font-semibold">
+      <div className="catalog-heading">
+        <div><h1>Catálogo</h1><p>Algo para celebrar. Algo para ti.</p></div>
+      <form role="search" onSubmit={(e) => e.preventDefault()} className="catalog-search">
+        <label htmlFor="busqueda" className="sr-only">
           Buscar productos
         </label>
-        <input
+        <div className="search-field"><Icon name="search" /><input
           id="busqueda"
+          name="q"
+          autoComplete="off"
           type="search"
           value={query}
           onChange={(e) => update({ q: e.target.value })}
           placeholder="Ej. chocolate, fresa…"
-          className="min-h-12 rounded-xl border border-line bg-white px-4"
-        />
+          className="px-4"
+        /></div>
       </form>
+      </div>
 
-      <div role="group" aria-label="Filtrar por categoría" className="mb-4 flex flex-wrap gap-2">
+      <div role="group" aria-label="Filtrar por categoría" className="catalog-filters">
         <button
           type="button"
           aria-pressed={category === ''}
@@ -74,7 +78,7 @@ export function CatalogPage() {
 
       {products.data && (
         <>
-          <p role="status" className="mb-4 text-muted">
+          <p role="status" className="catalog-count">
             {visible.length} {visible.length === 1 ? 'producto' : 'productos'}
           </p>
           {visible.length === 0 ? (

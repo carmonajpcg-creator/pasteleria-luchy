@@ -1,34 +1,48 @@
-/* Tokens de diseño — Pastelería Luchy (Fase 2). Fuente de verdad visual; en Fase 3 se migran a tailwind.config. */
+/* Luchy — vitrina de repostería. Fuente de verdad de la identidad visual. */
 :root {
-  /* Marca */
-  --purple-600: #7C3AED;   /* principal */
-  --purple-700: #6D28D9;   /* hover/pressed, texto morado sobre fondos claros */
-  --purple-400: #A78BFA;   /* suave */
-  --purple-100: #EDE9FE;
-  --green-600: #16A34A;    /* solo gráficos/decorativo: 3.30:1 con blanco */
-  --green-700: #15803D;    /* botones y texto verde: 5.02:1 con blanco */
-  --green-300: #86EFAC;    /* suave */
+  /* Primitivos */
+  --moss-900: #263c30;
+  --moss-700: #405c46;
+  --moss-600: #4f6238;
+  --sage-100: #e8eddf;
+  --paper-50: #faf9f6;
+  --paper-100: #f2f0e9;
+  --sand-200: #e3dece;
+  --charcoal-900: #272e28;
+  --charcoal-600: #5e665d;
+  --rose-100: #f4e5e1;
 
-  /* Neutros */
-  --bg: #FFF7FB;
-  --surface: #FFFFFF;
-  --text: #2D1B3D;
-  --text-muted: #6B7280;   /* 4.59:1 sobre --bg: usar solo en 14px+ */
-  --border: #E9DDF3;
-  --danger: #B91C1C;
+  /* Semánticos */
+  --brand: var(--moss-700);
+  --brand-hover: var(--moss-900);
+  --bg: var(--paper-50);
+  --surface: #ffffff;
+  --surface-soft: var(--paper-100);
+  --text: var(--charcoal-900);
+  --text-muted: var(--charcoal-600);
+  --border: #c9cdbf;
+  --danger: #a52c32;
+  --font-heading: 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  --font-body: 'Schibsted Grotesk Variable', system-ui, sans-serif;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: none;
+  --tap: 48px;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
 
-  /* Tipografía */
-  --font-heading: "Poppins", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  /* Compatibilidad de los prototipos y pantallas existentes con la marca nueva. */
+  --purple-600: var(--brand);
+  --purple-700: var(--brand-hover);
+  --purple-400: #8d9a7c;
+  --purple-100: var(--sage-100);
+  --green-600: #49814e;
+  --green-700: #28633b;
+  --green-300: #d3e2c7;
 
-  /* Espaciado y forma */
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 4px 20px rgb(124 58 237 / 0.10);
-  --tap: 48px;             /* alto mínimo de controles táctiles */
-  --focus: 0 0 0 3px #fff, 0 0 0 6px var(--purple-700);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  /* Componentes */
+  --button-bg: var(--brand);
+  --button-ink: #ffffff;
+  --button-radius: 999px;
+  --card-surface: var(--surface-soft);
+  --focus: 0 0 0 3px var(--bg), 0 0 0 6px var(--brand);
 }

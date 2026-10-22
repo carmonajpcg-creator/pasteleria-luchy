@@ -3,7 +3,10 @@ import { Loading, LoadError } from '../../../components/QueryState'
 import { btnPrimary } from '../../../components/ui'
 import { usePageTitle } from '../../../hooks/usePageTitle'
 import { formatMXN } from '../../../lib/money'
+import { Icon } from '../../../components/Icon'
 import { AvailabilityBadge } from '../../catalog/components/AvailabilityBadge'
+import { ProductImage } from '../../catalog/components/ProductImage'
+import { useProductImages } from '../../catalog/hooks'
 import { QuantitySelector } from '../components/QuantitySelector'
 import { useCart } from '../store'
 import { useCartLines } from '../useCartLines'
@@ -12,14 +15,16 @@ export function CartPage() {
   usePageTitle('Carrito')
   const { items, lines, missing, unavailable, totalCents, products } = useCartLines()
   const { setQuantity, remove } = useCart()
+  const images = useProductImages()
 
   return (
     <section>
       <h1 className="mb-4 text-3xl font-bold">Carrito</h1>
 
       {items.length === 0 ? (
-        <div className="rounded-card bg-white p-6 shadow-card">
-          <p className="mb-4">Tu carrito está vacío.</p>
+        <div className="cart-empty">
+          <Icon name="bag" />
+          <p>Tu carrito está vacío.</p>
           <Link to="/catalogo" className={btnPrimary}>
             Ver catálogo
           </Link>
@@ -48,7 +53,11 @@ export function CartPage() {
 
             <ul className="divide-y divide-line">
               {lines.map(({ item, product, lineTotalCents }) => (
-                <li key={product.id} className="grid gap-2 py-4">
+                <li key={product.id} className="cart-product-row">
+                  <Link to={`/producto/${product.slug}`} className="cart-product-photo" aria-label={`Ver ${product.name}`}>
+                    <ProductImage name={product.name} image={images.data?.find((image) => image.product_id === product.id)} className="aspect-square" demoLabel="Ejemplo" />
+                  </Link>
+                  <div className="grid min-w-0 gap-2">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <p className="font-semibold">
@@ -79,12 +88,13 @@ export function CartPage() {
                       Eliminar
                     </button>
                   </div>
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
 
-          <aside aria-labelledby="resumen" className="rounded-card bg-white p-4 shadow-card">
+          <aside aria-labelledby="resumen" className="rounded-card bg-purple-100 p-6">
             <h2 id="resumen" className="mb-2 text-xl font-bold">
               Resumen
             </h2>

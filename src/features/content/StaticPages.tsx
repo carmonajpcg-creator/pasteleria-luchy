@@ -2,6 +2,7 @@ import { Loading, LoadError } from '../../components/QueryState'
 import { btnPrimary } from '../../components/ui'
 import { usePageTitle } from '../../hooks/usePageTitle'
 import { useStoreSettings } from '../catalog/hooks'
+import { demoImages } from '../catalog/demoImages'
 
 const pending = <span className="text-muted">por definir</span>
 
@@ -17,12 +18,13 @@ function Draft() {
 export function AboutPage() {
   usePageTitle('Nosotros')
   return (
-    <section className="max-w-2xl">
-      <h1 className="mb-3 text-3xl font-bold">Nosotros</h1>
+    <section className="content-split">
+      <div className="content-copy"><h1>Nosotros</h1>
       <p>
         Somos una pastelería que prepara pasteles, cupcakes, galletas, brownies y postres. La historia y las
         fotografías definitivas del negocio se publicarán aquí cuando la tienda las proporcione.
-      </p>
+      </p><p className="mt-6">Desde un pequeño antojo hasta el pastel de una celebración: explora las opciones y cuéntanos cómo te gustaría compartirlo.</p></div>
+      <figure className="relative"><img src={demoImages.cookies} width="1024" height="1024" alt="Imagen de ejemplo: galletas de chocolate" /><figcaption className="demo-caption">Imagen de ejemplo</figcaption></figure>
     </section>
   )
 }
@@ -33,13 +35,14 @@ export function ContactPage() {
   const s = settings.data
 
   return (
-    <section className="max-w-2xl">
-      <h1 className="mb-3 text-3xl font-bold">Contacto</h1>
+    <section className="content-split">
+      <div className="content-copy"><h1>Contacto</h1>
+      <p>¿Planeamos algo dulce? Consulta nuestros datos y hablemos de tu pedido.</p>
       {settings.isPending && <Loading what="los datos de contacto" />}
       {settings.isError && <LoadError what="los datos de contacto" onRetry={() => void settings.refetch()} />}
       {s && (
         <>
-          <dl className="mb-6 grid gap-2">
+          <dl className="contact-details">
             <div>
               <dt className="font-semibold">Teléfono</dt>
               <dd>{s.contact_phone ?? pending}</dd>
@@ -63,7 +66,8 @@ export function ContactPage() {
             </a>
           )}
         </>
-      )}
+      )}</div>
+      <figure className="relative"><img src={demoImages.cake} width="1024" height="1024" alt="Imagen de ejemplo: pastel de celebración con fresas" /><figcaption className="demo-caption">Imagen de ejemplo</figcaption></figure>
     </section>
   )
 }

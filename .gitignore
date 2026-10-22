@@ -11,3 +11,4 @@ test-results/
 .supabase/
 *.log
 *.tsbuildinfo
+.taste-skill/

@@ -12,3 +12,5 @@ test-results/
 *.log
 *.tsbuildinfo
 .taste-skill/
+# Preferencias personales de permisos de Claude Code (cada persona tiene las suyas)
+.claude/settings.local.json

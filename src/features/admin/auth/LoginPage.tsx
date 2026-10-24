@@ -30,6 +30,8 @@ export function LoginPage() {
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/admin'
   const [formError, setFormError] = useState<string | null>(null)
+  // El enlace de recuperación solo aparece después de un intento fallido por credenciales.
+  const [wrongCredentials, setWrongCredentials] = useState(false)
 
   const {
     register,
@@ -39,6 +41,7 @@ export function LoginPage() {
 
   const onSubmit = handleSubmit(async ({ email, password }) => {
     setFormError(null)
+    setWrongCredentials(false)
     if (!supabase) {
       setFormError('El panel no está configurado.')
       return
@@ -46,6 +49,7 @@ export function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setFormError(loginErrorMessage(error))
+      setWrongCredentials(error.code === 'invalid_credentials')
       return
     }
     void navigate(from, { replace: true })
@@ -85,15 +89,17 @@ export function LoginPage() {
             {formError}
           </p>
         )}
+        {wrongCredentials && (
+          <p className="mb-4">
+            <Link to="/admin/recuperar" className="font-semibold text-purple-700 underline">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </p>
+        )}
         <button type="submit" disabled={isSubmitting} className={`${btnPrimary} w-full disabled:opacity-60`}>
           {isSubmitting ? 'Entrando…' : 'Entrar'}
         </button>
       </form>
-      <p className="mt-4 text-center">
-        <Link to="/admin/recuperar" className="font-semibold text-purple-700 underline">
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </p>
       <p className="mt-4 text-center">
         <Link to="/" className="font-semibold text-purple-700 underline">
           Volver a la tienda

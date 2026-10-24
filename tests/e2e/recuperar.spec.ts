@@ -7,6 +7,12 @@ test.describe('recuperar contraseña', () => {
     await mockSupabase(page)
     const { calls } = await mockAdmin(page)
     await page.goto('/#/admin/login')
+    // Solo se ofrece tras equivocarse de contraseña, no de entrada.
+    await expect(page.getByRole('link', { name: '¿Olvidaste tu contraseña?' })).toHaveCount(0)
+    await page.getByLabel('Correo').fill(ADMIN.email)
+    await page.getByLabel('Contraseña').fill('incorrecta')
+    await page.getByRole('button', { name: 'Entrar' }).click()
+    await expect(page.getByText('Correo o contraseña incorrectos.')).toBeVisible()
     await page.getByRole('link', { name: '¿Olvidaste tu contraseña?' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Recuperar contraseña' })).toBeVisible()
 

@@ -197,7 +197,7 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+email_sent = 30
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
@@ -234,15 +234,21 @@ otp_length = 8
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
-# Use a production-ready SMTP server
-# [auth.email.smtp]
-# enabled = true
-# host = "smtp.sendgrid.net"
-# port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# SMTP propio (Gmail con contraseña de aplicación). La clave NO va aquí: se lee de la variable de entorno
+# LUCHY_SMTP_PASSWORD al ejecutar «supabase config push». Solo se empuja a producción.
+[auth.email.smtp]
+enabled = true
+host = "smtp.gmail.com"
+port = 465
+user = "carmona.jpcg@gmail.com"
+pass = "env(LUCHY_SMTP_PASSWORD)"
+admin_email = "carmona.jpcg@gmail.com"
+sender_name = "Pastelería Luchy"
+
+# Correo de recuperación de contraseña, en español.
+[auth.email.template.recovery]
+subject = "Restablece tu contraseña · Pastelería Luchy"
+content_path = "./supabase/templates/recuperar.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

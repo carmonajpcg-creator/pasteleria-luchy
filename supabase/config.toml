@@ -392,6 +392,10 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Aviso de pedidos nuevos: se autentica con el secreto compartido x-webhook-secret, no con JWT de usuario.
+[functions.notify-order]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

@@ -245,3 +245,14 @@ Ver CLAUDE.md §14 (número de WhatsApp, cobertura, horarios, precios, política
 ## Recuperar la contraseña del administrador
 
 En `/#/admin/login` el enlace «¿Olvidaste tu contraseña?» pide el correo y Supabase Auth envía un enlace (flujo PKCE: el enlace vuelve a la raíz del sitio con `?code=…` y `src/lib/recoveryRedirect.ts` lo lleva a `/#/admin/restablecer`, necesario porque las rutas usan `#`). Debe abrirse **en el mismo navegador** donde se pidió. La contraseña nueva exige 12 caracteres. Probado con Playwright (8 casos, datos simulados). Limitación: el correo integrado de Supabase tiene un límite bajo de envíos y solo entrega a miembros de la organización; para más volumen, configurar SMTP propio (`[auth.email.smtp]`). Desde `localhost` el enlace del correo apunta al sitio publicado (la URL no está en la lista de redirecciones).
+
+## Reportes, avisos de pedidos y segundo administrador
+
+- **Reporte de ventas** (`/admin/reportes`): periodo libre o rápido, totales, ticket promedio, cancelados, pagos netos, ventas por día y productos más vendidos; descarga CSV (con BOM para Excel y celdas neutralizadas contra fórmulas). Lo calcula la función `admin_sales_report` (solo administradores, rango máximo de un año, fechas en la zona horaria de la tienda; una venta cuenta el día en que se confirmó). Migración `20260101001200_reporte_ventas.sql` aplicada en pruebas y producción; pgTAP en `reporte_ventas.test.sql`.
+- **Avisos de pedidos nuevos** (solo con el panel abierto): el menú muestra los pedidos pendientes de contacto, el título de la pestaña lleva «(n)» y, si se activa «Activar avisos de pedidos», suena un pitido y se muestra una notificación del navegador al llegar uno nuevo (revisión cada 30 s). **No hay aviso por correo ni con el panel cerrado**: requeriría un SMTP o proveedor de correo con credenciales, pendiente.
+- **Administradores**: hay dos cuentas en producción. El alta se hace con la API de administración de Auth y una fila en `profiles` (ver «Crear un administrador»); la contraseña compartida inicial debe cambiarse por cada persona con «¿Olvidaste tu contraseña?».
+- **Aviso de privacidad y condiciones**: redactados con las secciones habituales (LFPDPPP: responsable, datos, finalidades, derechos ARCO, WhatsApp, conservación). Siguen marcados como provisionales hasta que la tienda complete sus datos y una revisión legal los apruebe.
+
+### Pendiente: SMTP propio
+
+El correo integrado de Supabase entrega pocos mensajes por hora y solo a miembros de la organización. Para enviar desde un Gmail propio: crear una *contraseña de aplicación* (Google → Seguridad → Verificación en dos pasos), y en Supabase → Authentication → SMTP usar `smtp.gmail.com`, puerto 465, usuario el correo y esa contraseña. Alternativa con más cuota: Resend o Brevo con dominio propio. Las credenciales se capturan solo en el panel de Supabase, nunca en el repositorio.

@@ -31,6 +31,7 @@ export const adminRoutes: RouteObject = {
             { path: 'productos', ...lazyPage(() => import('../features/admin/catalog/pages/ProductsPage'), 'ProductsPage') },
             { path: 'productos/nuevo', ...lazyPage(() => import('../features/admin/catalog/pages/ProductFormPage'), 'ProductFormPage') },
             { path: 'productos/:id', ...lazyPage(() => import('../features/admin/catalog/pages/ProductFormPage'), 'ProductFormPage') },
+            { path: 'reportes', ...lazyPage(() => import('../features/admin/reports/ReportsPage'), 'ReportsPage') },
             { path: 'categorias', ...lazyPage(() => import('../features/admin/catalog/pages/CategoriesPage'), 'CategoriesPage') },
             { path: 'inventario', ...lazyPage(() => import('../features/admin/inventory/pages/InventoryPage'), 'InventoryPage') },
             { path: 'configuracion', ...lazyPage(() => import('../features/admin/settings/pages/SettingsPage'), 'SettingsPage') },

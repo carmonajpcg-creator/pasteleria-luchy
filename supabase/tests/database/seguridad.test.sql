@@ -31,7 +31,7 @@ select is(
 select is(
   (select string_agg(proname::text collate "default", ',' order by proname::text collate "default") from pg_proc
     where pronamespace = 'public'::regnamespace and has_function_privilege('authenticated', oid, 'execute')),
-  'adjust_stock,admin_capacity,admin_dashboard,admin_day_capacity,advance_order,cancel_order,confirm_order,'
+  'adjust_stock,admin_capacity,admin_dashboard,admin_day_capacity,admin_sales_report,advance_order,cancel_order,confirm_order,'
     || 'create_order,expire_pending_orders,get_availability,get_order_public,is_admin,is_product_public',
   'authenticated solo ejecuta las funciones previstas (las de admin validan el rol dentro)');
 select is(

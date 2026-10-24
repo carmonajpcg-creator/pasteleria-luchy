@@ -86,6 +86,7 @@ export interface AdminCalls {
   advanceOrder: { id: string; to: string }[]
   adjustStock: Json[]
   recover: { email: string; redirectTo: string | null }[]
+  reports: { from: string; to: string }[]
   passwordUpdates: string[]
   payments: Json[]
   productWrites: { method: string; body: Json }[]
@@ -115,7 +116,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 export async function mockAdmin(page: Page, options: AdminOptions = {}) {
   const state = initialState()
   const calls: AdminCalls = {
-    confirmOrder: [], cancelOrder: [], advanceOrder: [], adjustStock: [], recover: [], passwordUpdates: [], payments: [], productWrites: [],
+    confirmOrder: [], cancelOrder: [], advanceOrder: [], adjustStock: [], recover: [], reports: [], passwordUpdates: [], payments: [], productWrites: [],
     categoryWrites: [], settingsPatches: [], uploads: [], removed: [], authed: [],
   }
   let nextId = 100
@@ -215,6 +216,29 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
     switch (table) {
       case 'profiles':
         return send(route, [{ role: 'admin' }])
+
+      case 'admin_sales_report': {
+        const from = body!.p_from as string
+        const to = body!.p_to as string
+        calls.reports.push({ from, to })
+        const sold = state.orders.filter(
+          (o) => ['confirmed', 'in_preparation', 'ready', 'delivered'].includes(o.status) && o.confirmed_at && o.confirmed_at.slice(0, 10) >= from && o.confirmed_at.slice(0, 10) <= to,
+        )
+        const byDay = new Map<string, { orders: number; sales_cents: number }>()
+        for (const o of sold) {
+          const d = byDay.get(o.confirmed_at.slice(0, 10)) ?? { orders: 0, sales_cents: 0 }
+          byDay.set(o.confirmed_at.slice(0, 10), { orders: d.orders + 1, sales_cents: d.sales_cents + o.total_cents })
+        }
+        const byProduct = new Map<string, { sku: string; name: string; quantity: number; total_cents: number }>()
+        for (const o of sold) for (const i of o.order_items) {
+          const p = byProduct.get(i.sku) ?? { sku: i.sku, name: i.name, quantity: 0, total_cents: 0 }
+          byProduct.set(i.sku, { ...p, quantity: p.quantity + i.quantity, total_cents: p.total_cents + i.line_total_cents })
+        }
+        return send(route, {
+          from, to, orders: sold.length, sales_cents: sold.reduce((s, o) => s + o.total_cents, 0), cancelled: 0, paid_cents: 0,
+          by_day: [...byDay].map(([day, v]) => ({ day, ...v })), by_product: [...byProduct.values()],
+        })
+      }
 
       case 'admin_dashboard': {
         const byStatus: Record<string, number> = {}

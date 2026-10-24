@@ -85,6 +85,8 @@ export interface AdminCalls {
   cancelOrder: { id: string; reason: string }[]
   advanceOrder: { id: string; to: string }[]
   adjustStock: Json[]
+  recover: { email: string; redirectTo: string | null }[]
+  passwordUpdates: string[]
   payments: Json[]
   productWrites: { method: string; body: Json }[]
   categoryWrites: { method: string; body: Json | null }[]
@@ -113,7 +115,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 export async function mockAdmin(page: Page, options: AdminOptions = {}) {
   const state = initialState()
   const calls: AdminCalls = {
-    confirmOrder: [], cancelOrder: [], advanceOrder: [], adjustStock: [], payments: [], productWrites: [],
+    confirmOrder: [], cancelOrder: [], advanceOrder: [], adjustStock: [], recover: [], passwordUpdates: [], payments: [], productWrites: [],
     categoryWrites: [], settingsPatches: [], uploads: [], removed: [], authed: [],
   }
   let nextId = 100
@@ -139,6 +141,14 @@ export async function mockAdmin(page: Page, options: AdminOptions = {}) {
       })
     }
     if (path.endsWith('/logout')) return route.fulfill({ status: 204, headers: cors })
+    if (path.endsWith('/recover')) {
+      calls.recover.push({ email: (req.postDataJSON() as { email: string }).email, redirectTo: new URL(req.url()).searchParams.get('redirect_to') })
+      return send(route, {})
+    }
+    if (path.endsWith('/user') && req.method() === 'PUT') {
+      calls.passwordUpdates.push((req.postDataJSON() as { password: string }).password)
+      return send(route, { id: ADMIN.id, aud: 'authenticated', role: 'authenticated', email: ADMIN.email, app_metadata: {}, user_metadata: {}, created_at: '2026-01-01T00:00:00Z' })
+    }
     return send(route, { message: 'no simulado' }, 404)
   })
 

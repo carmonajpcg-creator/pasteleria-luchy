@@ -17,6 +17,8 @@ export const adminRoutes: RouteObject = {
   ),
   children: [
     { path: 'login', ...lazyPage(() => import('../features/admin/auth/LoginPage'), 'LoginPage') },
+    { path: 'recuperar', ...lazyPage(() => import('../features/admin/auth/ForgotPasswordPage'), 'ForgotPasswordPage') },
+    { path: 'restablecer', ...lazyPage(() => import('../features/admin/auth/ResetPasswordPage'), 'ResetPasswordPage') },
     {
       ...lazyPage(() => import('../features/admin/auth/RequireAdmin'), 'RequireAdmin'),
       children: [

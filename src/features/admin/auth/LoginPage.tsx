@@ -90,6 +90,11 @@ export function LoginPage() {
         </button>
       </form>
       <p className="mt-4 text-center">
+        <Link to="/admin/recuperar" className="font-semibold text-purple-700 underline">
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
+      <p className="mt-4 text-center">
         <Link to="/" className="font-semibold text-purple-700 underline">
           Volver a la tienda
         </Link>

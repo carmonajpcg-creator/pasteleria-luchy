@@ -241,3 +241,7 @@ En `.claude/skills/` hay cuatro skills de terceros revisadas e instaladas (`desi
 ## Pendientes antes de lanzamiento
 
 Ver CLAUDE.md §14 (número de WhatsApp, cobertura, horarios, precios, políticas, dominio).
+
+## Recuperar la contraseña del administrador
+
+En `/#/admin/login` el enlace «¿Olvidaste tu contraseña?» pide el correo y Supabase Auth envía un enlace (flujo PKCE: el enlace vuelve a la raíz del sitio con `?code=…` y `src/lib/recoveryRedirect.ts` lo lleva a `/#/admin/restablecer`, necesario porque las rutas usan `#`). Debe abrirse **en el mismo navegador** donde se pidió. La contraseña nueva exige 12 caracteres. Probado con Playwright (8 casos, datos simulados). Limitación: el correo integrado de Supabase tiene un límite bajo de envíos y solo entrega a miembros de la organización; para más volumen, configurar SMTP propio (`[auth.email.smtp]`). Desde `localhost` el enlace del correo apunta al sitio publicado (la URL no está en la lista de redirecciones).

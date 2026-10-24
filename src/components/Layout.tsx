@@ -55,7 +55,7 @@ export function Layout() {
             <div><h2>Nos vemos por aquí</h2><NavLink to="/catalogo">Explorar el catálogo</NavLink><NavLink to="/nosotros">Conoce Luchy</NavLink><NavLink to="/contacto">Contacto y entregas</NavLink></div>
             <div><h2>Planea tu pedido</h2><p>{settings.data?.schedule_text ? `Horarios: ${settings.data.schedule_text}` : 'Horarios y cobertura: por definir.'}</p><p>Elige en la web y confirma<br />con la tienda por WhatsApp.</p></div>
           </div>
-          <div className="footer-bottom"><p>Pastelería Luchy · Hecho para compartir</p><div><NavLink to="/privacidad">Privacidad</NavLink><NavLink to="/condiciones">Condiciones</NavLink><NavLink to="/admin">Acceso del personal (consola de pedidos)</NavLink></div></div>
+          <div className="footer-bottom"><p>Pastelería Luchy · Hecho para compartir</p><div><NavLink to="/privacidad">Privacidad</NavLink><NavLink to="/condiciones">Condiciones</NavLink></div></div>
         </div>
       </footer>
     </div>

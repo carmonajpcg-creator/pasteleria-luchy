@@ -53,12 +53,13 @@ test('el encabezado de cada página pública ofrece «Iniciar sesión» y no des
   }
 })
 
-test('el pie de cada página pública ofrece el acceso del personal a la consola de pedidos', async ({ page }) => {
+test('el acceso del personal está solo en el encabezado («Iniciar sesión»), no repetido en el pie', async ({ page }) => {
   for (const ruta of ['/#/', '/#/catalogo', '/#/contacto', '/#/privacidad']) {
     await page.goto(ruta)
-    await expect(page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ })).toBeVisible()
+    await expect(page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ })).toHaveCount(0)
+    await expect(page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Iniciar sesión' })).toBeVisible()
   }
-  await page.getByRole('contentinfo').getByRole('link', { name: /Acceso del personal/ }).click()
+  await page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Iniciar sesión' }).click()
   await expect(page).toHaveURL(/#\/admin\/login$/)
   await expect(page.getByRole('heading', { level: 1, name: 'Acceso administrador' })).toBeVisible()
 })

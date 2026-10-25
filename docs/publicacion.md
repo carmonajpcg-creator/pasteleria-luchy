@@ -102,6 +102,18 @@ Genera `backups/luchy-AAAAMMDD-HHMMSS.json` con categorías, productos, imágene
 movimientos, configuración y los ids/correos de administradores (nunca contraseñas). **Contiene datos
 personales de clientes**: no se versiona (`backups/` está ignorado); guárdalo cifrado y fuera del equipo.
 
+**Respaldo automático:** el flujo `Respaldo semanal de datos` (`.github/workflows/respaldo.yml`) corre los lunes y
+también a mano (*Actions → Respaldo semanal de datos → Run workflow*). Genera el mismo respaldo, lo **cifra con
+AES-256** (el repositorio es público) y lo guarda 90 días como artefacto `respaldo-cifrado`. Usa los secretos
+`BACKUP_DB_URL` y `BACKUP_PASSPHRASE`; **la frase debe guardarse también fuera de GitHub**, sin ella el respaldo no
+se abre. Para abrir uno descargado:
+
+```
+openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in luchy-AAAAMMDD-HHMMSS.json.enc -out respaldo.json
+```
+
+(pide la frase). Si cambias la contraseña de la base de datos, actualiza el secreto `BACKUP_DB_URL`.
+
 **Frecuencia recomendada:** semanal, y siempre antes de cambios grandes. El plan gratuito de Supabase
 **no incluye respaldos automáticos descargables**; el plan de pago añade copias diarias y recuperación a un
 punto en el tiempo, recomendable cuando haya pedidos reales (decisión del negocio).

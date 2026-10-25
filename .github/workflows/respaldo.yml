@@ -1,0 +1,50 @@
+name: Respaldo semanal de datos
+
+# Copia lógica de los datos de producción (solo lectura), CIFRADA antes de salir del ejecutor.
+# El repositorio es público: un artefacto sin cifrar expondría datos personales de clientes.
+# Secretos requeridos (Settings > Secrets and variables > Actions):
+#   BACKUP_DB_URL     cadena Session pooler de producción
+#   BACKUP_PASSPHRASE frase para cifrar (guárdala fuera del equipo: sin ella el respaldo no se puede abrir)
+on:
+  schedule:
+    - cron: '23 9 * * 1' # lunes 09:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  respaldo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar secretos
+        env:
+          DB: ${{ secrets.BACKUP_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PASS" ]; then
+            echo "Faltan los secretos BACKUP_DB_URL y/o BACKUP_PASSPHRASE." >&2
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Generar y cifrar el respaldo
+        env:
+          SUPABASE_DB_URL: ${{ secrets.BACKUP_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          node scripts/backup-datos.mjs backups
+          f=$(ls backups/luchy-*.json | head -n 1)
+          openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -salt -in "$f" -out "$f.enc" -pass env:BACKUP_PASSPHRASE
+          rm "$f"
+          ls -l backups
+      - uses: actions/upload-artifact@v7
+        with:
+          name: respaldo-cifrado
+          path: backups/*.enc
+          retention-days: 90
+          if-no-files-found: error
